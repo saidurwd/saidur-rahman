@@ -11,3 +11,5 @@ Artisan::command('inspire', function () {
 Schedule::command('posts:publish-scheduled')->everyMinute()->withoutOverlapping();
 
 Schedule::command('model:prune')->daily();
+
+Schedule::command('sitemap:generate')->dailyAt('03:00');

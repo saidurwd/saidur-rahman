@@ -15,15 +15,15 @@ class UserSeeder extends Seeder
             return;
         }
 
-        $password = env('ADMIN_PASSWORD') ?: Str::password(20);
+        $password = config('admin.seed.password') ?: Str::password(20);
 
         User::query()->create([
             'name' => 'Saidur Rahman',
-            'email' => env('ADMIN_EMAIL', 'saidurwd@gmail.com'),
+            'email' => config('admin.seed.email'),
             'password' => $password,
         ]);
 
-        if (! env('ADMIN_PASSWORD')) {
+        if (! config('admin.seed.password')) {
             $this->command?->warn("Admin password (shown once): {$password}");
         }
     }

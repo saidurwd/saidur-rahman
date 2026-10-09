@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
+use Spatie\ResponseCache\Facades\ResponseCache;
 
 class SettingService
 {
@@ -51,5 +52,6 @@ class SettingService
     {
         $this->loaded = null;
         Cache::forget(self::CACHE_KEY);
+        ResponseCache::clear();
     }
 }

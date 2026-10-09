@@ -62,4 +62,15 @@
       0 => 'Spatie\\MediaLibrary\\MediaLibraryServiceProvider',
     ),
   ),
+  'spatie/laravel-responsecache' => 
+  array (
+    'aliases' => 
+    array (
+      'ResponseCache' => 'Spatie\\ResponseCache\\Facades\\ResponseCache',
+    ),
+    'providers' => 
+    array (
+      0 => 'Spatie\\ResponseCache\\ResponseCacheServiceProvider',
+    ),
+  ),
 );

@@ -14,12 +14,12 @@
 <section class="blueprint overflow-hidden">
     <div class="wrap grid items-center gap-12 py-16 md:py-24 lg:grid-cols-[1.25fr_0.75fr]">
         <div>
-            @if ($settings->get('headline'))<p class="eyebrow mb-6" data-reveal>{{ $settings->get('headline') }}</p>@endif
-            <h1 class="text-display text-fg" data-reveal>{{ $settings->get('hero_title') ?: $siteName }}</h1>
+            @if ($settings->get('headline'))<p class="eyebrow mb-6">{{ $settings->get('headline') }}</p>@endif
+            <h1 class="text-display text-fg">{{ $settings->get('hero_title') ?: $siteName }}</h1>
             @if ($settings->get('positioning'))
-                <p class="mt-6 max-w-2xl text-lg text-muted md:text-xl" data-reveal>{{ $settings->get('positioning') }}</p>
+                <p class="mt-6 max-w-2xl text-lg text-muted md:text-xl">{{ $settings->get('positioning') }}</p>
             @endif
-            <div class="mt-9 flex flex-wrap items-center gap-4" data-reveal>
+            <div class="mt-9 flex flex-wrap items-center gap-4">
                 <x-site.button :href="route('projects.index')">View work</x-site.button>
                 @if ($hasCv)<x-site.button :href="url('/cv')" variant="outline">Download CV</x-site.button>@endif
             </div>

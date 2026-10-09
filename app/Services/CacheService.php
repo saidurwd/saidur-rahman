@@ -5,6 +5,7 @@ namespace App\Services;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Support\Facades\Cache;
+use Spatie\ResponseCache\Facades\ResponseCache;
 
 /**
  * Group-versioned cache that works on any store (no tags needed).
@@ -29,9 +30,11 @@ class CacheService
             : Cache::remember($key, $ttl, $callback);
     }
 
+    /** Invalidates the group, and the full-page cache with it, since every public page is built from this content. */
     public function flush(string $group = self::CONTENT): void
     {
         Cache::forever("cache-version.{$group}", $this->version($group) + 1);
+        ResponseCache::clear();
     }
 
     private function version(string $group): int

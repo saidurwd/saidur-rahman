@@ -6,16 +6,8 @@
     <meta name="theme-color" content="#0F1B2D">
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
 
-    {{-- Set the theme and the js flag before first paint so there is no flash. --}}
-    <script>
-        (function () {
-            var d = document.documentElement, t = null;
-            try { t = localStorage.getItem('theme'); } catch (e) {}
-            if (t !== 'light' && t !== 'dark') { t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
-            d.dataset.theme = t;
-            d.classList.add('js');
-        })();
-    </script>
+    {{-- Sets the theme and the js flag before first paint so there is no flash. The text is hashed in the CSP. --}}
+    <script>{!! \App\Support\ThemeInit::SCRIPT !!}</script>
 
     @hasSection('seo')
         @yield('seo')
@@ -24,15 +16,18 @@
     @endif
 
     @php
-        try {
-            $headingFont = Vite::asset('node_modules/@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2');
-        } catch (\Throwable) {
-            $headingFont = null;
+        $preloads = [];
+        foreach (['fraunces', 'inter'] as $family) {
+            try {
+                $preloads[] = Vite::asset("node_modules/@fontsource-variable/{$family}/files/{$family}-latin-wght-normal.woff2");
+            } catch (\Throwable) {
+                // No build manifest (tests, first run): skip the preload.
+            }
         }
     @endphp
-    @if ($headingFont)
-        <link rel="preload" href="{{ $headingFont }}" as="font" type="font/woff2" crossorigin>
-    @endif
+    @foreach ($preloads as $font)
+        <link rel="preload" href="{{ $font }}" as="font" type="font/woff2" crossorigin>
+    @endforeach
 
     <link rel="alternate" type="application/rss+xml" title="{{ $siteName }} — Articles" href="{{ url('/feed') }}">
 

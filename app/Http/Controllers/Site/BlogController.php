@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Services\ArticleHtml;
-use App\Services\PostViews;
 use App\Services\SeoService;
 use App\Services\SiteContent;
 use Illuminate\Http\Request;
@@ -51,10 +50,9 @@ class BlogController extends Controller
         ]);
     }
 
-    public function show(string $slug, Request $request, SiteContent $content, SeoService $seo, ArticleHtml $html, PostViews $views): View
+    public function show(string $slug, Request $request, SiteContent $content, SeoService $seo, ArticleHtml $html): View
     {
         $post = $content->post($slug) ?? abort(404);
-        $views->record($post, $request);
 
         $cover = $post->getFirstMedia('cover');
         $image = $cover ? ($cover->hasGeneratedConversion('large') ? $cover->getUrl('large') : $cover->getUrl()) : null;

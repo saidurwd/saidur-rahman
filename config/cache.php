@@ -59,6 +59,12 @@ return [
             'serialize' => (bool) env('CACHE_ARRAY_SERIALIZE', false),
         ],
 
+        // Holds the full-page cache in tests, kept apart from the default store so clearing one never wipes the other.
+        'responses_array' => [
+            'driver' => 'array',
+            'serialize' => true,
+        ],
+
         'database' => [
             'driver' => 'database',
             'connection' => env('DB_CACHE_CONNECTION'),

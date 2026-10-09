@@ -9,8 +9,8 @@
 | 4 · Admin modules | Done (tag `phase-4`) |
 | 5 · Public pages | Done (tag `phase-5`) |
 | 6 · Blog | Done (tag `phase-6`) |
-| 7 · Contact & CV | Done (awaiting review and tag) |
-| 8 · Hardening | Pending |
+| 7 · Contact & CV | Done (tag `phase-7`) |
+| 8 · Hardening | Done (awaiting review and tag) |
 | 9 · Launch | Pending |
 
 ## Phase 0 notes
@@ -83,3 +83,30 @@
 - **Analytics** (`TrackPageView` on all public routes): records successful HTML page loads after the response is sent (`defer`), without cookies. It stores the path without its query string, a visitor hash that includes the date (so a person cannot be followed across days), the country from Cloudflare's `CF-IPCountry` header when present, the referring host only, and mobile/tablet/desktop. Bots, Do Not Track, Global Privacy Control, the admin, errors and non-GET requests are skipped. Rows older than 400 days are pruned daily (`model:prune`).
 - **Dashboard**: stat boxes, an ApexCharts traffic line chart (30 days, zero-filled) with a table alternative, CV downloads by version (last 30 days and all time), top pages, top referrers, latest messages and drafts. ApexCharts loads only on the dashboard and follows the light/dark switch.
 - The sidebar now has a real route behind every entry (a test enforces it).
+
+## Phase 8 notes: hardening report
+
+### Security
+- **Headers** (`SecurityHeaders`, on every web response, cached pages included): CSP, `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, and HSTS on HTTPS outside local/testing. The admin also gets `X-Robots-Tag: noindex` and `Cache-Control: no-store`.
+- **CSP**: public pages allow our own scripts, one inline script by hash (`ThemeInit`, the light/dark initialiser), Cloudflare Turnstile and `'unsafe-eval'`. `'unsafe-eval'` is there only because Alpine.js compiles its attribute expressions at runtime; removing it means moving to Alpine's CSP build and rewriting every inline expression. The admin policy is stricter (no eval, no Cloudflare). Inline styles are allowed. `CSP_REPORT_ONLY=true` switches to report-only mode; the policy is skipped while the Vite dev server (`public/hot`) is running. Checked in a real browser: Alpine, ApexCharts and TinyMCE all run under it.
+- **Public pages set no cookies at all.** The session, cookie and CSRF middleware are removed from them (`routes/web.php`); only the contact form and the admin use sessions. This is what makes the full-page cache safe.
+- **Uploads**: the original of every image added through the media library is re-encoded without EXIF or GPS data (`StoreMediaDimensions`), as profile and share images already were. Dimensions are recorded for layout.
+- **Proxies**: `TRUSTED_PROXIES` in `.env` tells Laravel which proxies to believe for the real client IP and https. See `.env.production.example`.
+- **Seeder** no longer calls `env()` (it returned null once config is cached); it reads `config('admin.seed.*')`.
+- **Privacy page** seeded with a real summary of what the site collects. Review it before launch.
+- Still on the Phase 9 list: Nginx security headers for static files, `APP_DEBUG=false`, `.env` outside the web root, backups, optional IP restriction or Cloudflare Access for `/admin`.
+
+### Performance
+- **Full-page cache** (Spatie ResponseCache, `file` store, 24 hours): home, about, experience, projects, articles, services, CV, feed, sitemap and editable pages. Never cached: search results (any query other than `page` and `tech`), the contact page, downloads, the admin, redirects and 404s. `CacheService::flush()` and `SettingService::forget()` clear it, so any admin save shows on the site immediately. **After a deploy that changes views, run `php artisan responsecache:clear`** (it is not cleared by `view:cache`).
+- Page and article views are still counted when a page comes from the cache (`TrackPageView` and `CountPostView` run outside it).
+- `php artisan optimize` (config, route, view and event caches) works. Do not run tests with a cached config: it points the tests at your real MySQL database. Run `php artisan optimize:clear` first (`composer test` does this).
+- **Lighthouse** (mobile, simulated slow 4G, local PHP server without compression or HTTP/2, so only a baseline): Home 98, case study 97, article 97 for Performance; Accessibility 100 and Best Practices 100 on all three. SEO showed 66 only because non-production environments serve `Disallow: /` in robots.txt on purpose; production serves the real one. LCP was 2.3 to 2.4 s, above the 1.5 s target: the lab run sends uncompressed files over a throttled link. Re-measure on the real server (gzip or Brotli, HTTP/2, long-lived asset caching) in Phase 9. Fixes made from the first run: above-the-fold headings no longer fade in (Total Blocking Time fell from 680 ms to 30 ms), and the Inter and Fraunces fonts are preloaded.
+- Public JavaScript is about 19 KB gzipped (Alpine plus our code), under the 150 KB target.
+
+### SEO
+- `/sitemap.xml` (published pages with last-modified dates; regenerated nightly at 03:00 by `sitemap:generate` into `public/sitemap.xml`, with a dynamic fallback route) and `/robots.txt` (production only allows crawling, disallows `/admin`, downloads and searches, and names the sitemap). `public/sitemap.xml` is git-ignored.
+- Titles, descriptions, canonicals, Open Graph, Twitter cards, Person, Article and breadcrumb JSON-LD, RSS autodiscovery and image dimensions were already in place; they are covered by tests for every public page.
+- Search results are `noindex`; pagination pages carry their own canonical.
+
+### Quality
+- 517 tests, PHPStan level 6 with no baseline, Pint clean. No coverage driver (Xdebug or PCOV) is installed here, so coverage was raised by reviewing every Action and Service and adding direct tests for each (`tests/Unit/ActionsTest.php`, `tests/Unit/ServicesTest.php`).

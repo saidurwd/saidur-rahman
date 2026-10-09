@@ -5,6 +5,12 @@
  * disabled, so later phases only need to add the route.
  */
 return [
+    /* Used only by the first-time seeder. Set these in .env before seeding production. */
+    'seed' => [
+        'email' => env('ADMIN_EMAIL', 'saidurwd@gmail.com'),
+        'password' => env('ADMIN_PASSWORD'),
+    ],
+
     'menu' => [
         ['label' => 'Dashboard', 'icon' => 'speedometer2', 'route' => 'admin.dashboard'],
 

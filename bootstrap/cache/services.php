@@ -34,7 +34,8 @@
     30 => 'Pest\\Laravel\\PestServiceProvider',
     31 => 'Spatie\\Activitylog\\ActivitylogServiceProvider',
     32 => 'Spatie\\MediaLibrary\\MediaLibraryServiceProvider',
-    33 => 'App\\Providers\\AppServiceProvider',
+    33 => 'Spatie\\ResponseCache\\ResponseCacheServiceProvider',
+    34 => 'App\\Providers\\AppServiceProvider',
   ),
   'eager' => 
   array (
@@ -56,7 +57,8 @@
     15 => 'Pest\\Laravel\\PestServiceProvider',
     16 => 'Spatie\\Activitylog\\ActivitylogServiceProvider',
     17 => 'Spatie\\MediaLibrary\\MediaLibraryServiceProvider',
-    18 => 'App\\Providers\\AppServiceProvider',
+    18 => 'Spatie\\ResponseCache\\ResponseCacheServiceProvider',
+    19 => 'App\\Providers\\AppServiceProvider',
   ),
   'deferred' => 
   array (

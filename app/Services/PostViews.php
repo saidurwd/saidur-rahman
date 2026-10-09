@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -10,23 +9,19 @@ use Illuminate\Support\Facades\DB;
 /** Counts article views without cookies: one per visitor per article per 30 minutes, bots ignored. */
 class PostViews
 {
-    public function record(Post $post, Request $request): bool
+    public function record(string $slug, Request $request): bool
     {
-        $agent = (string) $request->userAgent();
-
-        if (Bots::isBot($agent) || $request->isMethod('HEAD')) {
+        if (Bots::isBot($request->userAgent()) || $request->isMethod('HEAD')) {
             return false;
         }
 
-        $visitor = hash('sha256', $request->ip().'|'.$agent);
+        $visitor = hash('sha256', $request->ip().'|'.$request->userAgent());
 
-        if (! Cache::add("post-view.{$post->id}.{$visitor}", 1, now()->addMinutes(30))) {
+        if (! Cache::add("post-view.{$slug}.{$visitor}", 1, now()->addMinutes(30))) {
             return false;
         }
 
         // Straight to the table: no model events, so no cache flush, activity log or updated_at change.
-        DB::table('posts')->where('id', $post->id)->increment('views');
-
-        return true;
+        return DB::table('posts')->where('slug', $slug)->increment('views') > 0;
     }
 }

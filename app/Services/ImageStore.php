@@ -60,6 +60,31 @@ class ImageStore
         return str_starts_with($path, 'http') ? $path : url(Storage::disk(self::DISK)->url($path));
     }
 
+    /**
+     * Re-encodes an image file in place in its own format, dropping all metadata (EXIF, GPS, camera data)
+     * after applying the camera's rotation. Files that are not a supported image are left alone.
+     */
+    public function stripMetadata(string $path, string $mime): void
+    {
+        if (! in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
+            return;
+        }
+
+        $image = @imagecreatefromstring((string) file_get_contents($path));
+
+        if ($image === false) {
+            return;
+        }
+
+        $image = $this->applyOrientation($image, $path, $mime);
+
+        match ($mime) {
+            'image/jpeg' => imagejpeg($image, $path, 92),
+            'image/png' => imagepng($image, $path, 6),
+            default => imagewebp($image, $path, 90),
+        };
+    }
+
     private function applyOrientation(\GdImage $image, string $path, string $mime): \GdImage
     {
         if ($mime !== 'image/jpeg' || ! function_exists('exif_read_data')) {
