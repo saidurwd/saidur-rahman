@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ProjectStatus;
+use App\Models\Concerns\HasPublishState;
 use App\Models\Concerns\HasSlug;
 use App\Models\Concerns\LogsChanges;
 use App\Models\Concerns\Orderable;
@@ -23,7 +24,7 @@ class Project extends Model implements HasMedia
     /** @use HasFactory<ProjectFactory> */
     use HasFactory;
 
-    use HasSlug, InteractsWithMedia, LogsChanges, Orderable, SoftDeletes;
+    use HasPublishState, HasSlug, InteractsWithMedia, LogsChanges, Orderable, SoftDeletes;
 
     protected $fillable = [
         'title', 'slug', 'client', 'role', 'period', 'summary', 'problem', 'solution', 'architecture',
@@ -51,6 +52,34 @@ class Project extends Model implements HasMedia
     public function scopeFeatured(Builder $query): void
     {
         $query->where('is_featured', true);
+    }
+
+    /** @return array<string, mixed> */
+    public function publishState(bool $published): array
+    {
+        return ['status' => $published ? ProjectStatus::Published : ProjectStatus::Draft];
+    }
+
+    /** @param Builder<static> $query */
+    public function scopeSearch(Builder $query, ?string $term): void
+    {
+        $term = trim((string) $term);
+
+        $query->when($term !== '', fn (Builder $q) => $q->where(
+            fn (Builder $w) => $w->where('title', 'like', "%{$term}%")->orWhere('client', 'like', "%{$term}%"),
+        ));
+    }
+
+    /** @param Builder<static> $query */
+    public function scopeWithStatus(Builder $query, ?string $status): void
+    {
+        $query->when(ProjectStatus::tryFrom((string) $status), fn (Builder $q, ProjectStatus $s) => $q->where('status', $s));
+    }
+
+    /** Public URL path, used for redirects when the slug changes and for the "View on site" link. */
+    public function publicPath(?string $slug = null): string
+    {
+        return '/projects/'.($slug ?? $this->slug);
     }
 
     public function registerMediaCollections(): void

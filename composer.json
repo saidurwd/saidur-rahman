@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.3",
         "chillerlan/php-qrcode": "^6.0",
+        "ezyang/htmlpurifier": "^4.19",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
         "pragmarx/google2fa": "^9.1",

@@ -39,3 +39,61 @@ document.querySelectorAll('form[data-unsaved-warning]').forEach((form) => {
         }
     });
 });
+
+// Rich-text editor, loaded only on pages that have one.
+if (document.querySelector('textarea[data-editor]')) {
+    import('./editor.js').then(({ initEditors }) => initEditors());
+}
+
+// Drag-and-drop reordering for tables marked data-sortable (posts the new order as ids).
+const sortable = document.querySelector('[data-sortable]');
+if (sortable) {
+    import('sortablejs').then(({ default: Sortable }) => {
+        Sortable.create(sortable, {
+            handle: '[data-drag-handle]',
+            animation: 150,
+            onEnd() {
+                const ids = [...sortable.querySelectorAll('[data-id]')].map((row) => row.dataset.id);
+                fetch(sortable.dataset.reorderUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        Accept: 'application/json',
+                    },
+                    body: JSON.stringify({ ids }),
+                }).then((response) => {
+                    if (!response.ok) {
+                        window.alert('Could not save the new order. Reload and try again.');
+                    }
+                });
+            },
+        });
+    });
+}
+
+// Bulk actions: select-all checkbox and enabling the action bar.
+document.querySelectorAll('[data-select-all]').forEach((all) => {
+    const boxes = () => document.querySelectorAll('input[name="ids[]"]');
+    all.addEventListener('change', () => boxes().forEach((box) => (box.checked = all.checked)));
+});
+
+// Live slug preview from the title while the slug field is untouched.
+document.querySelectorAll('[data-slug-source]').forEach((title) => {
+    const slug = document.getElementById(title.dataset.slugSource);
+    if (!slug || slug.dataset.locked === 'true') {
+        return;
+    }
+    let touched = slug.value !== '';
+    slug.addEventListener('input', () => (touched = slug.value !== ''));
+    title.addEventListener('input', () => {
+        if (!touched) {
+            slug.value = title.value
+                .toLowerCase()
+                .normalize('NFKD')
+                .replace(/[^\w\s-]/g, '')
+                .trim()
+                .replace(/[\s_-]+/g, '-');
+        }
+    });
+});

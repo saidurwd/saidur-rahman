@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CacheController;
 use App\Http\Controllers\Admin\ComponentDemoController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PasswordController;
+use App\Http\Controllers\Admin\ProjectController;
 use Illuminate\Support\Facades\Route;
 
 // Prefix `admin`, name `admin.` and the web middleware are applied in bootstrap/app.php.
@@ -37,6 +38,9 @@ Route::middleware(['auth', 'admin.2fa'])->group(function () {
 
     Route::get('password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
+
+    // Content modules. Projects is the reference; see docs/ADMIN_MODULE_PATTERN.md.
+    Route::adminModule('projects', ProjectController::class);
 
     Route::post('cache/clear', [CacheController::class, 'clear'])->name('cache.clear');
 

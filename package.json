@@ -25,6 +25,8 @@
         "alpinejs": "^3.17.4",
         "bootstrap": "^5.3.8",
         "bootstrap-icons": "^1.13.2",
-        "overlayscrollbars": "^2.16.0"
+        "overlayscrollbars": "^2.16.0",
+        "sortablejs": "^1.15.7",
+        "tinymce": "^8.9.3"
     }
 }
