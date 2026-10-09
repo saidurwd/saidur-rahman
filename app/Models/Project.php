@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\HasPublicPath;
 use App\Enums\ProjectStatus;
 use App\Models\Concerns\HasPublishState;
 use App\Models\Concerns\HasSlug;
@@ -19,7 +20,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[ObservedBy(ContentObserver::class)]
-class Project extends Model implements HasMedia
+class Project extends Model implements HasMedia, HasPublicPath
 {
     /** @use HasFactory<ProjectFactory> */
     use HasFactory;

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\AdminListFilters;
+use App\Models\Concerns\HasPublishState;
 use App\Models\Concerns\IsPublishable;
 use App\Models\Concerns\LogsChanges;
 use App\Models\Concerns\Orderable;
@@ -16,9 +18,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy(ContentObserver::class)]
 class Skill extends Model
 {
+    use AdminListFilters, HasPublishState;
+
     /** @use HasFactory<SkillFactory> */
     use HasFactory;
-
     use IsPublishable, LogsChanges, Orderable, SoftDeletes;
 
     protected $fillable = ['skill_group_id', 'name', 'level', 'years', 'sort_order', 'is_published'];
@@ -37,5 +40,11 @@ class Skill extends Model
     public function group(): BelongsTo
     {
         return $this->belongsTo(SkillGroup::class, 'skill_group_id');
+    }
+
+    /** @return list<string> */
+    protected function adminSearchColumns(): array
+    {
+        return ['name'];
     }
 }

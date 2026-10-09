@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\AdminListFilters;
+use App\Models\Concerns\HasPublishState;
 use App\Models\Concerns\IsPublishable;
 use App\Models\Concerns\LogsChanges;
 use App\Models\Concerns\Orderable;
@@ -16,9 +18,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy(ContentObserver::class)]
 class Menu extends Model
 {
+    use AdminListFilters, HasPublishState;
+
     /** @use HasFactory<MenuFactory> */
     use HasFactory;
-
     use IsPublishable, LogsChanges, Orderable, SoftDeletes;
 
     protected $fillable = ['label', 'url', 'route', 'location', 'sort_order', 'is_published'];
@@ -40,5 +43,11 @@ class Menu extends Model
     public function href(): string
     {
         return $this->route ? route($this->route) : (string) $this->url;
+    }
+
+    /** @return list<string> */
+    protected function adminSearchColumns(): array
+    {
+        return ['label', 'url'];
     }
 }

@@ -4,10 +4,19 @@ use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Admin\Auth\TwoFactorSetupController;
 use App\Http\Controllers\Admin\CacheController;
+use App\Http\Controllers\Admin\CertificationController;
 use App\Http\Controllers\Admin\ComponentDemoController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EducationController;
+use App\Http\Controllers\Admin\ExperienceController;
+use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\SkillController;
+use App\Http\Controllers\Admin\SkillGroupController;
+use App\Http\Controllers\Admin\TestimonialController;
 use Illuminate\Support\Facades\Route;
 
 // Prefix `admin`, name `admin.` and the web middleware are applied in bootstrap/app.php.
@@ -41,6 +50,15 @@ Route::middleware(['auth', 'admin.2fa'])->group(function () {
 
     // Content modules. Projects is the reference; see docs/ADMIN_MODULE_PATTERN.md.
     Route::adminModule('projects', ProjectController::class);
+    Route::adminModule('experiences', ExperienceController::class);
+    Route::adminModule('educations', EducationController::class);
+    Route::adminModule('certifications', CertificationController::class);
+    Route::adminModule('skill-groups', SkillGroupController::class);
+    Route::adminModule('skills', SkillController::class);
+    Route::adminModule('services', ServiceController::class);
+    Route::adminModule('testimonials', TestimonialController::class);
+    Route::adminModule('pages', PageController::class);
+    Route::adminModule('menus', MenuController::class);
 
     Route::post('cache/clear', [CacheController::class, 'clear'])->name('cache.clear');
 

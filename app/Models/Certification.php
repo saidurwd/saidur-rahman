@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\AdminListFilters;
+use App\Models\Concerns\HasPublishState;
 use App\Models\Concerns\IsPublishable;
 use App\Models\Concerns\LogsChanges;
 use App\Models\Concerns\Orderable;
@@ -15,9 +17,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy(ContentObserver::class)]
 class Certification extends Model
 {
+    use AdminListFilters, HasPublishState;
+
     /** @use HasFactory<CertificationFactory> */
     use HasFactory;
-
     use IsPublishable, LogsChanges, Orderable, SoftDeletes;
 
     protected $fillable = ['name', 'issuer', 'issued_at', 'expires_at', 'credential_url', 'sort_order', 'is_published'];
@@ -30,5 +33,11 @@ class Certification extends Model
             'expires_at' => 'date',
             'is_published' => 'boolean',
         ];
+    }
+
+    /** @return list<string> */
+    protected function adminSearchColumns(): array
+    {
+        return ['name', 'issuer'];
     }
 }

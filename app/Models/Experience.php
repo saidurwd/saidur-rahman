@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\AdminListFilters;
+use App\Models\Concerns\HasPublishState;
 use App\Models\Concerns\IsPublishable;
 use App\Models\Concerns\LogsChanges;
 use App\Observers\ContentObserver;
@@ -15,9 +17,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy(ContentObserver::class)]
 class Experience extends Model
 {
+    use AdminListFilters, HasPublishState;
+
     /** @use HasFactory<ExperienceFactory> */
     use HasFactory;
-
     use IsPublishable, LogsChanges, SoftDeletes;
 
     protected $fillable = ['company', 'role', 'location', 'employment_type', 'start_date', 'end_date', 'is_current', 'summary', 'achievements', 'sort_order', 'is_published'];
@@ -38,5 +41,11 @@ class Experience extends Model
     public function scopeOrdered(Builder $query): void
     {
         $query->orderByDesc('is_current')->orderByDesc('start_date');
+    }
+
+    /** @return list<string> */
+    protected function adminSearchColumns(): array
+    {
+        return ['company', 'role', 'location'];
     }
 }

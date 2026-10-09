@@ -13,6 +13,7 @@ return [
         ['label' => 'Articles', 'icon' => 'journal-text', 'route' => 'admin.posts.index'],
         ['label' => 'Experience', 'icon' => 'briefcase', 'route' => 'admin.experiences.index'],
         ['label' => 'Education', 'icon' => 'mortarboard', 'route' => 'admin.educations.index'],
+        ['label' => 'Certifications', 'icon' => 'patch-check', 'route' => 'admin.certifications.index'],
         ['label' => 'Skills', 'icon' => 'bar-chart-steps', 'route' => 'admin.skills.index'],
         ['label' => 'Services', 'icon' => 'tools', 'route' => 'admin.services.index'],
         ['label' => 'Testimonials', 'icon' => 'chat-quote', 'route' => 'admin.testimonials.index'],

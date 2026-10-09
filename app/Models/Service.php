@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Contracts\HasPublicPath;
+use App\Models\Concerns\AdminListFilters;
+use App\Models\Concerns\HasPublishState;
 use App\Models\Concerns\HasSlug;
 use App\Models\Concerns\IsPublishable;
 use App\Models\Concerns\LogsChanges;
@@ -14,8 +17,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ObservedBy(ContentObserver::class)]
-class Service extends Model
+class Service extends Model implements HasPublicPath
 {
+    use AdminListFilters, HasPublishState;
+
     /** @use HasFactory<ServiceFactory> */
     use HasFactory;
 
@@ -29,5 +34,16 @@ class Service extends Model
         return [
             'is_published' => 'boolean',
         ];
+    }
+
+    /** @return list<string> */
+    protected function adminSearchColumns(): array
+    {
+        return ['title', 'summary'];
+    }
+
+    public function publicPath(?string $slug = null): string
+    {
+        return '/services/'.($slug ?? $this->slug);
     }
 }
