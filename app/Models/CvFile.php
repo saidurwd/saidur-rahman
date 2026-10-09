@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 #[ObservedBy(ContentObserver::class)]
 class CvFile extends Model
@@ -21,6 +22,13 @@ class CvFile extends Model
     use LogsChanges, SoftDeletes;
 
     protected $fillable = ['label', 'file_path', 'is_active', 'downloads'];
+
+    public const DISK = 'local';
+
+    protected static function booted(): void
+    {
+        static::forceDeleted(fn (self $cv) => Storage::disk(self::DISK)->delete($cv->file_path));
+    }
 
     /** @return array<string, string> */
     protected function casts(): array
@@ -41,5 +49,12 @@ class CvFile extends Model
     public function downloadLog(): HasMany
     {
         return $this->hasMany(CvDownload::class);
+    }
+
+    public function sizeForHumans(): string
+    {
+        $bytes = Storage::disk(self::DISK)->exists($this->file_path) ? Storage::disk(self::DISK)->size($this->file_path) : 0;
+
+        return $bytes >= 1048576 ? round($bytes / 1048576, 1).' MB' : round($bytes / 1024).' KB';
     }
 }

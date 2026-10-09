@@ -1,19 +1,24 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Admin\Auth\TwoFactorSetupController;
 use App\Http\Controllers\Admin\CacheController;
 use App\Http\Controllers\Admin\CertificationController;
 use App\Http\Controllers\Admin\ComponentDemoController;
+use App\Http\Controllers\Admin\CvFileController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EducationController;
 use App\Http\Controllers\Admin\ExperienceController;
+use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\RedirectController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SkillController;
 use App\Http\Controllers\Admin\SkillGroupController;
 use App\Http\Controllers\Admin\TestimonialController;
@@ -59,6 +64,15 @@ Route::middleware(['auth', 'admin.2fa'])->group(function () {
     Route::adminModule('testimonials', TestimonialController::class);
     Route::adminModule('pages', PageController::class);
     Route::adminModule('menus', MenuController::class);
+    Route::adminModule('cv-files', CvFileController::class, ['reorder' => false]);
+    Route::post('cv-files/{cv_file}/activate', [CvFileController::class, 'activate'])->whereNumber('cv_file')->name('cv-files.activate');
+    Route::get('cv-files/{cv_file}/download', [CvFileController::class, 'download'])->whereNumber('cv_file')->name('cv-files.download');
+    Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
+    Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+    Route::get('activity', [ActivityController::class, 'index'])->name('activity.index');
+    Route::get('media', [MediaController::class, 'index'])->name('media.index');
+    Route::post('redirects/bulk', [RedirectController::class, 'bulk'])->name('redirects.bulk');
+    Route::resource('redirects', RedirectController::class)->except('show')->whereNumber('redirect');
 
     Route::post('cache/clear', [CacheController::class, 'clear'])->name('cache.clear');
 

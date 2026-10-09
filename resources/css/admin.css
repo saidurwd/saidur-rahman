@@ -99,7 +99,7 @@
 }
 
 .sidebar-menu button.nav-link {
-    color: var(--bs-nav-link-color, inherit);
+    color: var(--lte-sidebar-color, inherit);
 }
 
 .login-page {

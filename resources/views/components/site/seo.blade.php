@@ -16,7 +16,7 @@
     $fullTitle = $title ? "{$title} · {$siteName}" : $settings->get('seo_title', $siteName);
     $description = $description ?: $settings->get('seo_description');
     $canonical = $canonical ?: url()->current();
-    $image = $image ?: $settings->get('og_image');
+    $image = app(\App\Services\ImageStore::class)->url($image ?: $settings->get('og_image'));
     $schemas = array_is_list($schema) ? $schema : [$schema];
     $schemas = array_values(array_filter($schemas));
 @endphp

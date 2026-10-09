@@ -5,8 +5,8 @@
 | 0 · Foundation | Done (tag `phase-0`) |
 | 1 · Data model | Done (tag `phase-1`) |
 | 2 · Admin shell | Done (tag `phase-2`) |
-| 3 · Design system | Built, awaiting design approval at `/styleguide` |
-| 4 · Admin modules | Pending |
+| 3 · Design system | Done (tag `phase-3`) |
+| 4 · Admin modules | Done (awaiting review and tag) |
 | 5 · Public pages | Pending |
 | 6 · Blog | Pending |
 | 7 · Contact & CV | Pending |
@@ -46,3 +46,12 @@
 - Motion: `data-reveal` fade-up and the connector-line draw only apply when `prefers-reduced-motion: no-preference`.
 - The Tailwind bundle scans only `views/site` and `views/components/site`.
 - `/styleguide` is local and testing only.
+
+## Phase 4 notes
+- Reference module: Projects. Pattern and variations are in `docs/ADMIN_MODULE_PATTERN.md`; `/new-admin-module` (in `.claude/commands/`) walks Claude through adding another.
+- Modules: Projects, Experience, Education, Certifications, Skill groups, Skills, Services, Pages, Menus, Testimonials, Redirects, CV files, Profile & settings, plus read-only Activity log and Media. Articles come in Phase 6 and Messages in Phase 7.
+- Shared pieces: `ManagesModule` trait (Trash, restore, force delete, reorder, bulk), `Route::adminModule()` macro, `ReorderItems` and `ApplyBulkAction` actions, `SaveSlugged`, `HtmlSanitizer` (HTMLPurifier), `RedirectService` plus a 404 handler that serves recorded redirects, `ImageStore`, `AdminPolicy`.
+- TinyMCE 8 is self-hosted and loaded only on pages with a rich-text field. It runs under the GPL licence key (`license_key: 'gpl'`); check that is acceptable for how the site is distributed, or switch to Trix.
+- New npm/composer packages in this phase: `tinymce`, `sortablejs`, `ezyang/htmlpurifier`.
+- Sidebar entries gained Certifications. Skill groups are reached from the Skills page.
+- Public pages do not read these yet (Phase 5). Redirects for changed slugs already work for any path.

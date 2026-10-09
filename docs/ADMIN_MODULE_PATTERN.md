@@ -10,8 +10,8 @@ Reference files: `app/Http/Controllers/Admin/ProjectController.php`, `resources/
 | --- | --- |
 | `app/Models/Thing.php` | Model with `SoftDeletes`, `Orderable`, `LogsChanges`, a `published()` scope, and `HasPublishState` if it can be published. |
 | `app/Policies/ThingPolicy.php` | `class ThingPolicy extends AdminPolicy {}` (auto-discovered). Override a method to restrict it. |
-| `app/Http/Requests/Admin/StoreThingRequest.php`, `UpdateThingRequest.php` | Validation. Share rules in an abstract `ThingRequest` when they overlap (see `ProjectRequest`). |
-| `app/Actions/Admin/SaveThing.php` | Create and update in one place: purify rich text, set `sort_order`, write redirects for slug changes, handle media. Skip it for trivial modules and use `$model->fill($data)->save()` in the controller. |
+| `app/Http/Requests/Admin/SaveThingRequest.php` | One Form Request for create and update; `authorize()` picks the `create` or `update` ability from the route. Split into Store/Update only when the rules really differ (see `ProjectRequest` and its two subclasses). |
+| `app/Actions/Admin/SaveThing.php` | Create and update in one place: purify rich text, set `sort_order`, write redirects for slug changes, handle media. For modules with a slug and rich text, reuse `SaveSlugged` (the model implements `HasPublicPath`). Trivial modules skip the action and call `create()`/`update()` in the controller. |
 | `app/Http/Controllers/Admin/ThingController.php` | Thin: `index`, `create`, `store`, `edit`, `update`, `destroy`, plus `use ManagesModule` for Trash, restore, force delete, reorder and bulk. |
 | `resources/views/admin/things/index.blade.php`, `form.blade.php` | List and the shared create/edit form. Trash uses `admin/modules/trash.blade.php`. |
 | `routes/admin.php` | One line: `Route::adminModule('things', ThingController::class);` |
@@ -55,3 +55,20 @@ Reference files: `app/Http/Controllers/Admin/ProjectController.php`, `resources/
 ## Tests to include
 
 Guests are redirected; index lists, searches, filters and paginates; create and update validate and store (with purified HTML and slug rules where relevant); soft delete, restore and force delete; reorder and bulk actions if the module has them; the activity log records a change. `signInAsAdmin()` in `tests/Pest.php` signs in an admin who has passed 2FA.
+
+## Modules built on this pattern
+
+Projects (reference, own `SaveProject` action for media), Experience, Education, Certifications, Skill groups, Skills, Services, Pages, Menus, Testimonials. Variations worth copying:
+
+- No drag reorder: Experience (ordered by date). Pass `'reorder' => false` to `Route::adminModule`.
+- Slug and redirects through `SaveSlugged`: Services, Pages (Pages also blocks reserved slugs).
+- Select options from another table: Skills (`groups` passed from the controller).
+- Media on the model: Testimonials (`HasMedia`, a `photo` collection, `syncPhoto()`).
+- Approval instead of publish: Testimonials override `publishState()` and `publishColumn()`.
+
+Modules that deliberately do not follow the full shape:
+
+- **Redirects**: no Trash, order or publish state, so a plain controller, hard delete, and `RedirectController::bulk` for bulk delete.
+- **CV files**: `ManagesModule` plus `SaveCvFile`; files live on the private `local` disk under random names, one active version per label, download through an authenticated route.
+- **Profile & settings**: a single form handled by `SaveSettings`; images go through `ImageStore` (WebP, EXIF removed).
+- **Activity log** and **Media**: read-only lists (policies for these vendor models are registered in `AppServiceProvider`).
