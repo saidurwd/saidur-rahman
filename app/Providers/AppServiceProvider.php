@@ -8,8 +8,11 @@ use App\Policies\ActivityPolicy;
 use App\Policies\MediaPolicy;
 use App\Services\SettingService;
 use App\Services\SiteShell;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -35,6 +38,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Vendor models are not auto-discovered, so their admin policies are registered by hand.
+        // The contact form sends email, so it is limited per address: 3 a minute and 10 an hour.
+        RateLimiter::for('contact', fn (Request $request) => [
+            Limit::perMinute(3)->by($request->ip()),
+            Limit::perHour(10)->by($request->ip()),
+        ]);
+
         Event::listen(MediaHasBeenAddedEvent::class, StoreMediaDimensions::class);
 
         Gate::policy(Activity::class, ActivityPolicy::class);

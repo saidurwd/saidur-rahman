@@ -8,8 +8,8 @@
 | 3 · Design system | Done (tag `phase-3`) |
 | 4 · Admin modules | Done (tag `phase-4`) |
 | 5 · Public pages | Done (tag `phase-5`) |
-| 6 · Blog | Done (awaiting review and tag) |
-| 7 · Contact & CV | Pending |
+| 6 · Blog | Done (tag `phase-6`) |
+| 7 · Contact & CV | Done (awaiting review and tag) |
 | 8 · Hardening | Pending |
 | 9 · Launch | Pending |
 
@@ -73,3 +73,13 @@
 - Public: `/blog` (9 per page, category chips with counts, search), `/blog/category/{slug}`, `/blog/tag/{slug}`, `/blog/{slug}` and `/feed` (RSS 2.0 with full content). The list, categories and article pages come from `SiteContent` and are cached; search is not cached. Search uses the MySQL full-text index for terms of 3+ characters and a literal LIKE otherwise (checked on MySQL; the test suite runs on SQLite, which takes the LIKE path).
 - Article pages: table of contents with unique heading ids (`ArticleHtml`), reading progress bar, a copy-link `#` on headings, related articles by shared tags and category, share links (no third-party scripts) and Article plus breadcrumb JSON-LD. Search results are `noindex`; page 2 and later have their own canonical.
 - The cache allow-list (`config/cache.php`) gained Category, Tag and Pivot.
+
+## Phase 7 notes
+- **Contact form** (`/contact`): `ContactRequest` (single-line fields lose line breaks, so mail headers cannot be injected), a hidden honeypot field, an encrypted "form rendered at" token (submissions under 3 seconds are dropped silently; expired or tampered tokens get an error), a rate limit of 3 a minute and 10 an hour per address (`RateLimiter::for('contact')`), a ten-minute duplicate guard, and Cloudflare Turnstile. Bots that fail the honeypot or timing check see the normal thank-you page. Messages with more than two links are saved as Spam and send no email.
+- **Turnstile** is enabled when both `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` are set; with neither (local work) the check is skipped. If Cloudflare cannot be reached the form fails closed. Phase 8's CSP must allow `challenges.cloudflare.com`.
+- **Mail**: `StoreContactMessage` saves the message and queues `NewContactMessage` (to the contact email setting, falling back to `MAIL_FROM_ADDRESS`; Reply-To is the sender) and `ContactAutoReply` (switchable in Profile & settings). Both are Markdown mailables using a branded copy of Laravel's mail theme in `resources/views/vendor/mail`. They are queued, so a queue worker must run in production (`QUEUE_CONNECTION=database`; Supervisor in Phase 9), and `.env` needs real `MAIL_*` settings. Locally `MAIL_MAILER=log` writes them to the log. Before launch, SPF/DKIM/DMARC for the sending domain (checklist in the doc).
+- **Inbox** (`/admin/messages`): Inbox/Unread/Starred/Spam folders with counts, search, a reading view that marks a message read once, a mailto reply with the original quoted, star, mark replied/unread/spam, bulk actions, Trash, and CSV export of the current folder (cells that start like a spreadsheet formula are neutralised). The unread badge in the sidebar and navbar is the number of messages with status New.
+- **CV** (`/cv`, `/cv/download/{id}`): lists the active version per label; the download is streamed from the private disk under a tidy file name with `X-Robots-Tag: noindex`. Each download writes a `cv_downloads` row (same-day visitor hash, country, referring host) and bumps `cv_files.downloads` directly in the table, so `updated_at` and the public cache are untouched. The same visitor counts once per ten minutes and bots are not counted.
+- **Analytics** (`TrackPageView` on all public routes): records successful HTML page loads after the response is sent (`defer`), without cookies. It stores the path without its query string, a visitor hash that includes the date (so a person cannot be followed across days), the country from Cloudflare's `CF-IPCountry` header when present, the referring host only, and mobile/tablet/desktop. Bots, Do Not Track, Global Privacy Control, the admin, errors and non-GET requests are skipped. Rows older than 400 days are pruned daily (`model:prune`).
+- **Dashboard**: stat boxes, an ApexCharts traffic line chart (30 days, zero-filled) with a table alternative, CV downloads by version (last 30 days and all time), top pages, top referrers, latest messages and drafts. ApexCharts loads only on the dashboard and follows the light/dark switch.
+- The sidebar now has a real route behind every entry (a test enforces it).

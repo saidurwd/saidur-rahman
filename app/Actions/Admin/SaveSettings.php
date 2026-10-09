@@ -16,7 +16,7 @@ class SaveSettings
         'seo_title' => 'seo', 'seo_description' => 'seo',
     ];
 
-    public const BOOLEANS = ['availability_open' => 'profile'];
+    public const BOOLEANS = ['availability_open' => 'profile', 'contact_autoreply' => 'profile'];
 
     /** key => [group, max width] */
     public const IMAGES = ['profile_photo' => ['profile', 900], 'og_image' => ['seo', 1200]];

@@ -45,6 +45,11 @@ if (document.querySelector('textarea[data-editor]')) {
     import('./editor.js').then(({ initEditors }) => initEditors());
 }
 
+// Dashboard charts, loaded only where there is one.
+if (document.querySelector('[data-chart]')) {
+    import('./charts.js').then(({ initCharts }) => initCharts());
+}
+
 // Drag-and-drop reordering for tables marked data-sortable (posts the new order as ids).
 const sortable = document.querySelector('[data-sortable]');
 if (sortable) {

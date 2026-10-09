@@ -29,8 +29,14 @@ it('renders the branded dashboard with sidebar groups', function () {
         ->assertSee('Unread messages');
 });
 
-it('disables sidebar items whose module does not exist yet', function () {
-    $this->get('/admin')->assertSee('aria-disabled="true"', false);
+it('links every sidebar item to a route that exists', function () {
+    $missing = collect(config('admin.menu'))
+        ->filter(fn ($item) => isset($item['route']) && ! Route::has($item['route']))
+        ->pluck('label')
+        ->all();
+
+    expect($missing)->toBe([]);
+    $this->get('/admin')->assertDontSee('aria-disabled="true"', false);
 });
 
 it('renders every admin component on the demo page', function () {

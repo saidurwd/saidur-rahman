@@ -30,6 +30,7 @@ class SaveSettingsRequest extends FormRequest
             'location' => ['nullable', 'string', 'max:190'],
             'contact_email' => ['nullable', 'email', 'max:190'],
             'availability_open' => ['boolean'],
+            'contact_autoreply' => ['boolean'],
             'availability_text' => ['nullable', 'string', 'max:190'],
             'linkedin' => ['nullable', 'url:https', 'max:255'],
             'github' => ['nullable', 'url:https', 'max:255'],

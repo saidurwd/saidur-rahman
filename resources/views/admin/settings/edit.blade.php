@@ -24,8 +24,9 @@
                 <x-admin.form.textarea name="philosophy" label="Leadership philosophy" :value="$values['philosophy'] ?? ''" :rows="4" help="Shown on the About page." />
                 <div class="row">
                     <div class="col-md-6"><x-admin.form.input name="location" label="Location" :value="$values['location'] ?? ''" /></div>
-                    <div class="col-md-6"><x-admin.form.input name="contact_email" type="email" label="Contact email" :value="$values['contact_email'] ?? ''" /></div>
+                    <div class="col-md-6"><x-admin.form.input name="contact_email" type="email" label="Contact email" :value="$values['contact_email'] ?? ''" help="Contact form messages are emailed here and published in the footer." /></div>
                 </div>
+                <x-admin.form.toggle name="contact_autoreply" label="Send senders an automatic confirmation email" :checked="$values['contact_autoreply'] ?? true" />
             </x-admin.card>
 
             <x-admin.card title="Numbers strip">

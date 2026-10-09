@@ -10,13 +10,11 @@ use Illuminate\Support\Facades\DB;
 /** Counts article views without cookies: one per visitor per article per 30 minutes, bots ignored. */
 class PostViews
 {
-    private const BOT = '/bot|crawl|spider|slurp|preview|headless|monitor|uptime|curl|wget|python|httpclient|facebookexternalhit/i';
-
     public function record(Post $post, Request $request): bool
     {
         $agent = (string) $request->userAgent();
 
-        if ($agent === '' || preg_match(self::BOT, $agent) || $request->isMethod('HEAD')) {
+        if (Bots::isBot($agent) || $request->isMethod('HEAD')) {
             return false;
         }
 
