@@ -1,5 +1,126 @@
-/* Admin styles. AdminLTE 4 is installed in Phase 2. Tailwind is not used here. */
-body {
-    font-family: system-ui, sans-serif;
-    margin: 0;
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'admin-lte/dist/css/adminlte.css';
+
+/*
+ * Brand: tea-leaf green as the primary colour. AdminLTE/Bootstrap compile the
+ * primary into component variables, so those are re-pointed here.
+ */
+:root,
+[data-bs-theme='light'],
+[data-bs-theme='dark'] {
+    --bs-primary: #2f7d5b;
+    --bs-primary-rgb: 47, 125, 91;
+    --bs-link-color: #2f7d5b;
+    --bs-link-color-rgb: 47, 125, 91;
+    --bs-link-hover-color: #276a4d;
+    --bs-link-hover-color-rgb: 39, 106, 77;
+    --bs-focus-ring-color: rgba(47, 125, 91, 0.25);
+    --bs-primary-text-emphasis: #1c4b37;
+    --bs-primary-bg-subtle: #d5e5de;
+    --bs-primary-border-subtle: #abccbd;
+    --brand-brass: #b08d57;
+    --brand-ink: #0f1b2d;
+}
+
+[data-bs-theme='dark'] {
+    --bs-link-color: #5fb28d;
+    --bs-link-color-rgb: 95, 178, 141;
+    --bs-link-hover-color: #7cc4a3;
+    --bs-link-hover-color-rgb: 124, 196, 163;
+    --bs-primary-text-emphasis: #8cc8ac;
+    --bs-primary-bg-subtle: #0f2a1f;
+    --bs-primary-border-subtle: #1c4b37;
+    --bs-body-bg: #0f1b2d;
+    --bs-body-bg-rgb: 15, 27, 45;
+    --bs-tertiary-bg: #15243a;
+    --bs-tertiary-bg-rgb: 21, 36, 58;
+    --bs-secondary-bg: #1a2c47;
+    --bs-secondary-bg-rgb: 26, 44, 71;
+    --bs-border-color: #263a58;
+}
+
+.btn-primary,
+.btn-outline-primary:hover,
+.btn-check:checked + .btn-outline-primary {
+    --bs-btn-bg: #2f7d5b;
+    --bs-btn-border-color: #2f7d5b;
+    --bs-btn-hover-bg: #276a4d;
+    --bs-btn-hover-border-color: #246246;
+    --bs-btn-active-bg: #246246;
+    --bs-btn-active-border-color: #215a40;
+    --bs-btn-disabled-bg: #2f7d5b;
+    --bs-btn-disabled-border-color: #2f7d5b;
+    --bs-btn-focus-shadow-rgb: 47, 125, 91;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: #2f7d5b;
+    --bs-btn-border-color: #2f7d5b;
+    --bs-btn-hover-bg: #2f7d5b;
+    --bs-btn-hover-border-color: #2f7d5b;
+    --bs-btn-active-bg: #2f7d5b;
+    --bs-btn-active-border-color: #2f7d5b;
+}
+
+[data-bs-theme='dark'] .btn-outline-primary {
+    --bs-btn-color: #5fb28d;
+}
+
+.bg-primary {
+    background-color: #2f7d5b !important;
+}
+
+.form-check-input:checked,
+.form-switch .form-check-input:checked {
+    background-color: #2f7d5b;
+    border-color: #2f7d5b;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #2f7d5b;
+    box-shadow: 0 0 0 0.25rem rgba(47, 125, 91, 0.25);
+}
+
+.sidebar-brand .brand-text {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.brand-monogram {
+    width: 1.9rem;
+    height: 1.9rem;
+    flex: none;
+}
+
+.sidebar-menu .nav-link.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.sidebar-menu button.nav-link {
+    color: var(--bs-nav-link-color, inherit);
+}
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.otp-input {
+    letter-spacing: 0.4em;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+.image-upload-preview {
+    max-height: 9rem;
+    border-radius: var(--bs-border-radius);
+}
+
+.card-primary.card-outline {
+    --lte-card-variant-bg: #2f7d5b;
+    border-top-color: #2f7d5b;
 }

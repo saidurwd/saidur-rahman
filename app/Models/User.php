@@ -36,4 +36,16 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
         ];
     }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->two_factor_secret !== null && $this->two_factor_confirmed_at !== null;
+    }
+
+    /** @return list<string> */
+    public function recoveryCodes(): array
+    {
+        /** @var list<string> */
+        return $this->two_factor_recovery_codes ? (array) json_decode($this->two_factor_recovery_codes, true) : [];
+    }
 }

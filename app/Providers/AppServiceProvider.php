@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Message;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer(['admin.partials.sidebar', 'admin.partials.navbar'], function ($view): void {
+            $view->with('sidebarBadges', ['unread_messages' => Message::unread()->count()]);
+        });
     }
 }
