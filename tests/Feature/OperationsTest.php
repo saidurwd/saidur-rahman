@@ -12,6 +12,7 @@ use App\Services\SystemStatus;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification;
 use Spatie\Backup\Notifications\Notifications\BackupWasSuccessfulNotification;
@@ -222,5 +223,16 @@ describe('deployment configuration', function () {
             ->values()->all();
 
         expect($offenders)->toBe([]);
+    });
+});
+
+describe('empty environment values', function () {
+    it('boots with every optional variable left blank, as in a fresh .env.example', function () {
+        // Run in a separate process so the blank values really come from the environment, as they do on a server.
+        $env = ['BACKUP_NOTIFICATION_EMAIL' => '', 'BACKUP_DISKS' => '', 'BACKUP_AWS_DEFAULT_REGION' => '', 'BACKUP_AWS_BUCKET' => '', 'BACKUP_ARCHIVE_PASSWORD' => '', 'TURNSTILE_SITE_KEY' => '', 'TURNSTILE_SECRET_KEY' => '', 'TRUSTED_PROXIES' => '', 'MAIL_FROM_ADDRESS' => ''];
+
+        $result = Process::path(base_path())->env($env + ['APP_ENV' => 'testing', 'DB_CONNECTION' => 'sqlite', 'DB_DATABASE' => ':memory:'])->run([PHP_BINARY, 'artisan', 'about', '--only=environment']);
+
+        expect($result->successful())->toBeTrue($result->errorOutput().$result->output());
     });
 });

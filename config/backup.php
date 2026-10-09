@@ -236,7 +236,8 @@ return [
         'notifiable' => Notifiable::class,
 
         'mail' => [
-            'to' => env('BACKUP_NOTIFICATION_EMAIL', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+            // ?: because an empty value in .env arrives as an empty string, which the package rejects at boot.
+            'to' => env('BACKUP_NOTIFICATION_EMAIL') ?: env('MAIL_FROM_ADDRESS') ?: 'hello@example.com',
 
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
@@ -297,7 +298,7 @@ return [
     'monitor_backups' => [
         [
             'name' => 'saidur-rahman',
-            'disks' => array_values(array_filter(array_map('trim', explode(',', (string) env('BACKUP_DISKS', 'backups'))))),
+            'disks' => array_values(array_filter(array_map('trim', explode(',', (string) (env('BACKUP_DISKS') ?: 'backups'))))),
             'health_checks' => [
                 // A nightly backup that is more than two days old means something is wrong.
                 MaximumAgeInDays::class => 2,
