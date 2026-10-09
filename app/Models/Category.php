@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Contracts\HasPublicPath;
+use App\Models\Concerns\AdminListFilters;
 use App\Models\Concerns\HasSlug;
 use App\Models\Concerns\LogsChanges;
 use App\Models\Concerns\Orderable;
@@ -14,12 +16,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ObservedBy(ContentObserver::class)]
-class Category extends Model
+class Category extends Model implements HasPublicPath
 {
+    use AdminListFilters, HasSlug, LogsChanges, Orderable, SoftDeletes;
+
     /** @use HasFactory<CategoryFactory> */
     use HasFactory;
-
-    use HasSlug, LogsChanges, Orderable, SoftDeletes;
 
     protected $fillable = ['name', 'slug', 'sort_order'];
 
@@ -32,5 +34,16 @@ class Category extends Model
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
+    }
+
+    /** @return list<string> */
+    protected function adminSearchColumns(): array
+    {
+        return ['name'];
+    }
+
+    public function publicPath(?string $slug = null): string
+    {
+        return '/blog/category/'.($slug ?? $this->slug);
     }
 }

@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use App\Contracts\HasPublicPath;
 use App\Enums\PostStatus;
+use App\Models\Concerns\AdminListFilters;
+use App\Models\Concerns\HasPublishState;
 use App\Models\Concerns\HasSlug;
 use App\Models\Concerns\LogsChanges;
 use App\Models\Concerns\Orderable;
@@ -20,19 +23,18 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[ObservedBy(ContentObserver::class)]
-class Post extends Model implements HasMedia
+class Post extends Model implements HasMedia, HasPublicPath
 {
+    use AdminListFilters, HasPublishState, HasSlug, InteractsWithMedia, LogsChanges, Orderable, SoftDeletes;
+
     /** @use HasFactory<PostFactory> */
     use HasFactory;
-
-    use HasSlug, InteractsWithMedia, LogsChanges, Orderable, SoftDeletes;
 
     protected $fillable = [
         'title', 'slug', 'excerpt', 'body', 'category_id', 'status', 'published_at', 'reading_minutes',
         'views', 'seo_title', 'seo_description', 'og_image', 'sort_order',
     ];
 
-    /** @return array<string, string> */
     protected function casts(): array
     {
         return [
@@ -88,5 +90,58 @@ class Post extends Model implements HasMedia
     {
         $this->addMediaConversion('thumb')->performOnCollections('cover')->width(480)->format('webp');
         $this->addMediaConversion('large')->performOnCollections('cover')->width(1400)->format('webp');
+    }
+
+    /** @return list<string> */
+    protected function adminSearchColumns(): array
+    {
+        return ['title', 'excerpt'];
+    }
+
+    /**
+     * Publishing from the bulk action goes live now unless a date was already set.
+     *
+     * @return array<string, mixed>
+     */
+    public function publishState(bool $published): array
+    {
+        return $published
+            ? ['status' => PostStatus::Published, 'published_at' => $this->published_at ?? now()]
+            : ['status' => PostStatus::Draft];
+    }
+
+    /** @param Builder<static> $query */
+    public function scopeWithStatus(Builder $query, ?string $status): void
+    {
+        $query->when(PostStatus::tryFrom((string) $status), fn (Builder $q, PostStatus $s) => $q->where('status', $s));
+    }
+
+    /**
+     * Public search. Uses the MySQL full-text index when the term is long enough for it
+     * (InnoDB ignores words under 3 characters) and a plain LIKE match otherwise.
+     *
+     * @param  Builder<static>  $query
+     */
+    public function scopeMatching(Builder $query, ?string $term): void
+    {
+        $term = trim((string) $term);
+
+        if ($term === '') {
+            return;
+        }
+
+        if ($query->getModel()->getConnection()->getDriverName() === 'mysql' && mb_strlen($term) >= 3) {
+            $query->whereFullText(['title', 'excerpt', 'body'], $term);
+
+            return;
+        }
+
+        $like = '%'.addcslashes($term, '%_\\').'%';
+        $query->where(fn (Builder $w) => $w->where('title', 'like', $like)->orWhere('excerpt', 'like', $like)->orWhere('body', 'like', $like));
+    }
+
+    public function publicPath(?string $slug = null): string
+    {
+        return '/blog/'.($slug ?? $this->slug);
     }
 }
