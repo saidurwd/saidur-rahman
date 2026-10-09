@@ -7,8 +7,8 @@
 | 2 · Admin shell | Done (tag `phase-2`) |
 | 3 · Design system | Done (tag `phase-3`) |
 | 4 · Admin modules | Done (tag `phase-4`) |
-| 5 · Public pages | Done (awaiting review and tag) |
-| 6 · Blog | Pending |
+| 5 · Public pages | Done (tag `phase-5`) |
+| 6 · Blog | Done (awaiting review and tag) |
 | 7 · Contact & CV | Pending |
 | 8 · Hardening | Pending |
 | 9 · Launch | Pending |
@@ -64,3 +64,12 @@
 - Images: `x-site.image` uses the WebP `thumb` and `large` conversions with `srcset`, and width/height recorded at upload by `StoreMediaDimensions`, so there is no layout shift. Images uploaded before this phase have no recorded size until they are re-uploaded.
 - Error pages: a styled 404 on the site layout, and a self-contained 500/503/403/419/429 that needs no database or build.
 - `[x-cloak]` now hides only when JavaScript runs, so timeline details are readable without it.
+
+## Phase 6 notes
+- Admin: Articles (`PostController`, `SavePost`), Categories (generated from the module pattern) and Tags (a small plain module like Redirects: no Trash, deleting only detaches). Sidebar gained Categories and Tags.
+- Publishing: status is Draft, Scheduled or Published. `SavePost` settles the pair: a Published article with a future date becomes Scheduled, a Scheduled one with a past date becomes Published, and editing keeps the original date. `posts:publish-scheduled` runs every minute from `routes/console.php` (it needs the scheduler cron from the deploy checklist) and saves each due post so the public cache clears. Visibility does not depend on it: `Post::published()` already counts a scheduled post whose time has passed.
+- Dates and times are read and shown in `config('app.timezone')` (UTC unless `APP_TIMEZONE` is set). Set `APP_TIMEZONE` in `.env` to your own zone so "publish at 09:00" means 09:00 for you.
+- Reading time is computed on save (200 words per minute). Views are counted without cookies: one per visitor per article per 30 minutes, bots and empty user agents ignored, written straight to the table so the cache, activity log and `updated_at` are untouched.
+- Public: `/blog` (9 per page, category chips with counts, search), `/blog/category/{slug}`, `/blog/tag/{slug}`, `/blog/{slug}` and `/feed` (RSS 2.0 with full content). The list, categories and article pages come from `SiteContent` and are cached; search is not cached. Search uses the MySQL full-text index for terms of 3+ characters and a literal LIKE otherwise (checked on MySQL; the test suite runs on SQLite, which takes the LIKE path).
+- Article pages: table of contents with unique heading ids (`ArticleHtml`), reading progress bar, a copy-link `#` on headings, related articles by shared tags and category, share links (no third-party scripts) and Article plus breadcrumb JSON-LD. Search results are `noindex`; page 2 and later have their own canonical.
+- The cache allow-list (`config/cache.php`) gained Category, Tag and Pivot.

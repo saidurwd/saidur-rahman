@@ -2,6 +2,7 @@
 
 use App\Enums\PostStatus;
 use App\Enums\ProjectStatus;
+use App\Models\Category;
 use App\Models\Certification;
 use App\Models\Education;
 use App\Models\Experience;
@@ -11,8 +12,10 @@ use App\Models\Project;
 use App\Models\Service;
 use App\Models\Skill;
 use App\Models\SkillGroup;
+use App\Models\Tag;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
@@ -162,6 +165,7 @@ return [
         Illuminate\Support\Carbon::class,
         Media::class,
         MediaCollection::class,
+        Category::class,
         Certification::class,
         Education::class,
         Experience::class,
@@ -171,6 +175,8 @@ return [
         Service::class,
         Skill::class,
         SkillGroup::class,
+        Tag::class,
+        Pivot::class,
         PostStatus::class,
         ProjectStatus::class,
     ],

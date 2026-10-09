@@ -136,8 +136,12 @@ class Post extends Model implements HasMedia, HasPublicPath
             return;
         }
 
-        $like = '%'.addcslashes($term, '%_\\').'%';
-        $query->where(fn (Builder $w) => $w->where('title', 'like', $like)->orWhere('excerpt', 'like', $like)->orWhere('body', 'like', $like));
+        // "!" is the escape character, so a typed % or _ is matched literally.
+        $like = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $term).'%';
+        $query->where(fn (Builder $w) => $w
+            ->whereRaw('title LIKE ? ESCAPE ?', [$like, '!'])
+            ->orWhereRaw('excerpt LIKE ? ESCAPE ?', [$like, '!'])
+            ->orWhereRaw('body LIKE ? ESCAPE ?', [$like, '!']));
     }
 
     public function publicPath(?string $slug = null): string

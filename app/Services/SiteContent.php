@@ -11,7 +11,9 @@ use App\Models\Post;
 use App\Models\Project;
 use App\Models\Service;
 use App\Models\SkillGroup;
+use App\Models\Tag;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Everything the public site reads. Always published content only, always cached in the
@@ -109,6 +111,114 @@ class SiteContent
     public function latestPosts(int $limit = 3): Collection
     {
         return $this->remember("posts.latest.{$limit}", fn () => Post::query()->published()->latestPublished()->limit($limit)->get());
+    }
+
+    public const POSTS_PER_PAGE = 9;
+
+    /** Columns for article lists. The body is left out so the cached list stays small. */
+    private const POST_LIST = ['id', 'title', 'slug', 'excerpt', 'category_id', 'status', 'published_at', 'reading_minutes', 'views', 'seo_title', 'seo_description', 'created_at', 'updated_at'];
+
+    /** @return Collection<int, Post> all live articles, newest first, without their bodies */
+    public function posts(): Collection
+    {
+        return $this->remember('posts', fn () => Post::query()
+            ->published()
+            ->select(self::POST_LIST)
+            ->with(['category', 'tags', 'media'])
+            ->orderByDesc('published_at')
+            ->get());
+    }
+
+    /** @return list<array{name: string, slug: string, count: int}> categories that have live articles */
+    public function categories(): array
+    {
+        return $this->posts()
+            ->filter(fn (Post $post) => $post->category !== null)
+            ->groupBy('category_id')
+            ->map(fn ($posts) => ['name' => $posts->first()->category->name, 'slug' => $posts->first()->category->slug, 'count' => $posts->count(), 'order' => (int) $posts->first()->category->sort_order])
+            ->sortBy('order')
+            ->map(fn (array $c) => ['name' => $c['name'], 'slug' => $c['slug'], 'count' => $c['count']])
+            ->values()
+            ->all();
+    }
+
+    /** @return array{name: string, slug: string, count: int}|null */
+    public function category(string $slug): ?array
+    {
+        return collect($this->categories())->firstWhere('slug', $slug);
+    }
+
+    public function tag(string $slug): ?Tag
+    {
+        return $this->posts()->flatMap(fn (Post $post) => $post->tags)->firstWhere('slug', $slug);
+    }
+
+    /** @return LengthAwarePaginator<int, Post> */
+    public function blogPage(?string $categorySlug, ?string $tagSlug, int $page): LengthAwarePaginator
+    {
+        $posts = $this->posts()
+            ->when($categorySlug, fn ($c) => $c->filter(fn (Post $p) => $p->category?->slug === $categorySlug))
+            ->when($tagSlug, fn ($c) => $c->filter(fn (Post $p) => $p->tags->contains('slug', $tagSlug)))
+            ->values();
+
+        return new LengthAwarePaginator(
+            $posts->forPage($page, self::POSTS_PER_PAGE)->values(),
+            $posts->count(),
+            self::POSTS_PER_PAGE,
+            $page,
+            ['path' => url()->current()],
+        );
+    }
+
+    /**
+     * Search is not cached (every query is different), but it still only sees live articles.
+     *
+     * @return LengthAwarePaginator<int, Post>
+     */
+    public function searchPosts(string $term, int $page): LengthAwarePaginator
+    {
+        return Post::query()
+            ->published()
+            ->matching($term)
+            ->select(self::POST_LIST)
+            ->with(['category', 'tags', 'media'])
+            ->orderByDesc('published_at')
+            ->paginate(self::POSTS_PER_PAGE, page: $page)
+            ->appends(['q' => $term]);
+    }
+
+    /** A single live article with its body. */
+    public function post(string $slug): ?Post
+    {
+        return $this->remember("post.{$slug}", fn () => Post::query()->published()->with(['category', 'tags', 'media'])->where('slug', $slug)->first());
+    }
+
+    /**
+     * Other live articles, ranked by shared tags and category, newest first on ties.
+     *
+     * @return Collection<int, Post>
+     */
+    public function related(Post $post, int $limit = 3): Collection
+    {
+        $tagIds = $post->tags->pluck('id');
+
+        return $this->posts()
+            ->reject(fn (Post $other) => $other->id === $post->id)
+            ->map(function (Post $other) use ($post, $tagIds) {
+                $other->setAttribute('relevance', $other->tags->pluck('id')->intersect($tagIds)->count() * 2 + ($other->category_id && $other->category_id === $post->category_id ? 1 : 0));
+
+                return $other;
+            })
+            ->filter(fn (Post $other) => $other->getAttribute('relevance') > 0)
+            ->sortByDesc(fn (Post $other) => [$other->getAttribute('relevance'), $other->published_at])
+            ->take($limit)
+            ->values();
+    }
+
+    /** @return Collection<int, Post> the latest articles with their bodies, for the RSS feed */
+    public function feedPosts(int $limit = 20): Collection
+    {
+        return $this->remember('feed', fn () => Post::query()->published()->with('category')->orderByDesc('published_at')->limit($limit)->get());
     }
 
     public function page(string $slug): ?Page

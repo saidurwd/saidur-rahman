@@ -465,6 +465,35 @@
     font-size: 1.15em;
 }
 
+.prose-site h2,
+.prose-site h3 {
+    scroll-margin-top: 6rem;
+}
+
+.prose-site .heading-link {
+    margin-left: 0.5rem;
+    border: 0;
+    background: none;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.prose-site h2:hover .heading-link,
+.prose-site h3:hover .heading-link,
+.prose-site .heading-link:focus-visible {
+    opacity: 1;
+}
+
+@media (hover: none) {
+    .prose-site .heading-link {
+        opacity: 0.6;
+    }
+}
+
 .prose-site pre,
 .prose-site code {
     font-family: var(--font-mono);

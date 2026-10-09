@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Post;
+use Carbon\CarbonInterface;
+
 /** Builds the structured data (JSON-LD) the public pages hand to <x-site.seo>. */
 class SeoService
 {
@@ -45,5 +48,29 @@ class SeoService
                 'item' => $item[1] ?? null,
             ]))->all(),
         ];
+    }
+
+    /** @return array<string, mixed> */
+    public function article(Post $post, ?string $image): array
+    {
+        return array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'Article',
+            'headline' => $post->title,
+            'description' => $post->seo_description ?: $post->excerpt,
+            'image' => $image,
+            'datePublished' => $this->iso($post->getAttribute('published_at')),
+            'dateModified' => $this->iso($post->getAttribute('updated_at')),
+            'author' => array_filter(['@type' => 'Person', 'name' => $this->settings->get('site_name', config('app.name')), 'url' => url('/about')]),
+            'publisher' => ['@type' => 'Person', 'name' => $this->settings->get('site_name', config('app.name'))],
+            'mainEntityOfPage' => url($post->publicPath()),
+            'keywords' => $post->tags->pluck('name')->implode(', ') ?: null,
+            'articleSection' => $post->category?->name,
+        ]);
+    }
+
+    private function iso(mixed $date): ?string
+    {
+        return $date instanceof CarbonInterface ? $date->toIso8601String() : null;
     }
 }

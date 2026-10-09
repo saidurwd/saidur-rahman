@@ -34,6 +34,8 @@
         <link rel="preload" href="{{ $headingFont }}" as="font" type="font/woff2" crossorigin>
     @endif
 
+    <link rel="alternate" type="application/rss+xml" title="{{ $siteName }} — Articles" href="{{ url('/feed') }}">
+
     @vite(['resources/css/site.css', 'resources/js/site.js'])
     @stack('head')
 </head>
@@ -110,6 +112,7 @@
                 @foreach ($socialLinks as $label => $url)
                     <li><a href="{{ $url }}" rel="me noopener" target="_blank" class="text-fg no-underline hover:text-accent">{{ $label }}</a></li>
                 @endforeach
+                <li><a href="{{ url('/feed') }}" class="text-fg no-underline hover:text-accent">RSS feed</a></li>
                 @if ($contactEmail)
                     <li><a href="mailto:{{ $contactEmail }}" class="text-fg no-underline hover:text-accent">{{ $contactEmail }}</a></li>
                 @endif

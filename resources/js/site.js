@@ -84,6 +84,59 @@ Alpine.data('countUp', (value) => ({
     },
 }));
 
+// Thin reading-progress bar for articles.
+Alpine.data('readingProgress', () => ({
+    progress: 0,
+    init() {
+        this.update();
+    },
+    update() {
+        const article = document.getElementById('article');
+        if (!article) {
+            return;
+        }
+        const rect = article.getBoundingClientRect();
+        const scrollable = rect.height - window.innerHeight;
+        this.progress = scrollable <= 0 ? 100 : Math.min(100, Math.max(0, (-rect.top / scrollable) * 100));
+    },
+}));
+
+// "Copy link" button for sharing.
+Alpine.data('copyLink', (url) => ({
+    copied: false,
+    async copy() {
+        try {
+            await navigator.clipboard.writeText(url);
+            this.copied = true;
+            setTimeout(() => (this.copied = false), 2000);
+        } catch {
+            window.prompt('Copy this link', url);
+        }
+    },
+}));
+
+// A small "#" next to article headings that copies a link straight to that section.
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-copy-headings] h2[id], [data-copy-headings] h3[id]').forEach((heading) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'heading-link';
+        button.textContent = '#';
+        button.setAttribute('aria-label', `Copy link to “${heading.textContent}”`);
+        button.addEventListener('click', async () => {
+            const link = `${location.origin}${location.pathname}#${heading.id}`;
+            try {
+                await navigator.clipboard.writeText(link);
+                button.textContent = '✓';
+                setTimeout(() => (button.textContent = '#'), 1500);
+            } catch {
+                location.hash = heading.id;
+            }
+        });
+        heading.appendChild(button);
+    });
+});
+
 // Fade-up on scroll. Elements are only hidden by CSS when motion is allowed.
 const reveal = () => {
     const nodes = document.querySelectorAll('[data-reveal]');
