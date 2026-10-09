@@ -9,11 +9,13 @@ class SettingService
 {
     public const CACHE_KEY = 'settings.all';
 
+    /** @var array<string, mixed>|null per-request copy, so repeated get() calls do not hit the cache store */
+    private ?array $loaded = null;
+
     /** @return array<string, mixed> */
     public function all(): array
     {
-        /** @var array<string, mixed> */
-        return Cache::rememberForever(self::CACHE_KEY, fn () => Setting::query()
+        return $this->loaded ??= Cache::rememberForever(self::CACHE_KEY, fn () => Setting::query()
             ->pluck('value', 'key')
             ->all());
     }
@@ -47,6 +49,7 @@ class SettingService
 
     public function forget(): void
     {
+        $this->loaded = null;
         Cache::forget(self::CACHE_KEY);
     }
 }

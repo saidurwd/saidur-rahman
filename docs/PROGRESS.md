@@ -4,8 +4,8 @@
 | --- | --- |
 | 0 · Foundation | Done (tag `phase-0`) |
 | 1 · Data model | Done (tag `phase-1`) |
-| 2 · Admin shell | Done (awaiting review and tag) |
-| 3 · Design system | Pending |
+| 2 · Admin shell | Done (tag `phase-2`) |
+| 3 · Design system | Built, awaiting design approval at `/styleguide` |
 | 4 · Admin modules | Pending |
 | 5 · Public pages | Pending |
 | 6 · Blog | Pending |
@@ -35,3 +35,14 @@
 - Components live in `resources/views/components/admin/` (card, stat, status-badge, table, delete-button, monogram, `form/{input,textarea,select,editor,image-upload,toggle}`). `/admin/components` renders them all in local and testing only. `x-admin.form.editor` is a plain textarea marked `data-editor="rich"` until TinyMCE arrives in Phase 4.
 - The site Tailwind bundle now scans only `resources/views/site`, so admin classes never leak into it.
 - Seeded admin has no 2FA yet: sign in, then you are sent to set it up.
+
+## Phase 3 notes
+- Design: "The Architect's Ledger". Tokens live in `resources/css/site.css` (`@theme` plus semantic CSS variables `--bg`, `--surface`, `--fg`, `--muted`, `--line`, `--accent`, `--highlight` that flip with `[data-theme="dark"]`). Use the semantic utilities (`bg-bg`, `text-fg`, `text-muted`, `border-line`, `text-accent`) so both themes work; use brand colours (`bg-leaf`, `text-brass-deep`) only for fixed brand uses.
+- Fonts are self-hosted via `@fontsource-variable/{fraunces,inter,jetbrains-mono}` (latin subsets load on demand); the heading font is preloaded in the layout.
+- Theme: an inline script in `<head>` sets `data-theme` (stored choice, else the system preference) and a `js` class before first paint. `x-site.theme-toggle` stores the choice in `localStorage`. Phase 8's CSP needs a nonce or hash for this inline script.
+- Components in `resources/views/components/site/`: `seo`, `button`, `tag`, `section-heading`, `timeline-node`, `theme-toggle`, `monogram`. Reusable CSS classes: `.wrap`, `.label`, `.eyebrow`, `.btn*`, `.link`, `.card`, `.tag*`, `.blueprint`, `.draw`, `.timeline`.
+- Layout `site.layouts.app`: skip link, sticky header that shrinks on scroll, mobile menu (Alpine), footer. Header and footer menus come from the `menus` table via `NavigationService` (cached, cleared by the content observer). Socials, email and the availability chip come from settings and are hidden when empty.
+- `x-site.seo`: title, description, canonical, Open Graph, Twitter, robots, and JSON-LD through a `:schema` prop (one array or a list). The prop encodes safely, so values cannot break out of the script tag. Pages set it with `@section('seo')`.
+- Motion: `data-reveal` fade-up and the connector-line draw only apply when `prefers-reduced-motion: no-preference`.
+- The Tailwind bundle scans only `views/site` and `views/components/site`.
+- `/styleguide` is local and testing only.

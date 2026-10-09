@@ -7,7 +7,7 @@ beforeEach(function () {
 it('serves the public home page with the site bundle', function () {
     $this->get('/')
         ->assertOk()
-        ->assertSee('Site placeholder.');
+        ->assertSee('built in Phase 5');
 });
 
 it('serves the admin login with the admin bundle only', function () {
