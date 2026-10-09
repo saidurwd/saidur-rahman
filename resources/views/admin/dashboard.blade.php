@@ -23,6 +23,10 @@
 @endphp
 
 @section('content')
+    @foreach ($systemProblems as $problem)
+        <div class="alert alert-warning d-flex align-items-start gap-2" role="alert"><i class="bi bi-exclamation-triangle-fill mt-1"></i><div>{{ $problem }}</div></div>
+    @endforeach
+
     <div class="row">
         <div class="col-sm-6 col-lg-3"><x-admin.stat label="Page views (30 days)" :value="number_format($stats['views'])" icon="graph-up" /></div>
         <div class="col-sm-6 col-lg-3"><x-admin.stat label="Daily visitors, summed" :value="number_format($stats['visitors'])" icon="people" tone="success" /></div>

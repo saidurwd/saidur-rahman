@@ -11,6 +11,7 @@ use App\Models\Message;
 use App\Models\PageView;
 use App\Models\Post;
 use App\Models\Project;
+use App\Services\SystemStatus;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
@@ -18,7 +19,7 @@ class DashboardController extends Controller
 {
     private const DAYS = 30;
 
-    public function __invoke(): View
+    public function __invoke(SystemStatus $system): View
     {
         $from = now()->subDays(self::DAYS - 1)->startOfDay();
 
@@ -38,6 +39,8 @@ class DashboardController extends Controller
         });
 
         return view('admin.dashboard', [
+            // Only meaningful on the live server; locally nothing runs the scheduler or a worker.
+            'systemProblems' => app()->isProduction() ? $system->problems() : [],
             'stats' => [
                 'views' => $days->sum('views'),
                 'visitors' => $days->sum('visitors'),

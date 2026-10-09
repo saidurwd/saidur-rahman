@@ -23,11 +23,6 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Behind Nginx and Cloudflare the real client address and the https scheme arrive in forwarded headers.
-        // Set TRUSTED_PROXIES to the proxy addresses (comma separated), or * only if the server accepts traffic from nothing but them.
-        $proxies = (string) env('TRUSTED_PROXIES', '');
-        $middleware->trustProxies(at: $proxies === '*' ? '*' : array_values(array_filter(array_map('trim', explode(',', $proxies)))));
-
         $middleware->web(append: [SecurityHeaders::class]);
         $middleware->alias(['admin.2fa' => EnsureTwoFactor::class]);
         $middleware->redirectGuestsTo(fn (Request $request) => $request->is('admin', 'admin/*')
