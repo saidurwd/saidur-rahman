@@ -77,6 +77,11 @@ class Project extends Model implements HasMedia, HasPublicPath
         $query->when(ProjectStatus::tryFrom((string) $status), fn (Builder $q, ProjectStatus $s) => $q->where('status', $s));
     }
 
+    public function usesTech(string $tech): bool
+    {
+        return in_array(mb_strtolower($tech), array_map('mb_strtolower', (array) $this->tech_stack), true);
+    }
+
     /** Public URL path, used for redirects when the slug changes and for the "View on site" link. */
     public function publicPath(?string $slug = null): string
     {

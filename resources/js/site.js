@@ -47,6 +47,43 @@ Alpine.data('expandable', (open = false) => ({
     },
 }));
 
+// Counts a figure up once when it scrolls into view. The server-rendered value is the fallback.
+Alpine.data('countUp', (value) => ({
+    display: value,
+    init() {
+        const match = String(value).match(/^([^\d]*)(\d[\d,]*)(.*)$/);
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!match || reduced || !('IntersectionObserver' in window)) {
+            return;
+        }
+        const [, prefix, number, suffix] = match;
+        const target = parseInt(number.replace(/,/g, ''), 10);
+        const format = (n) => (number.includes(',') ? n.toLocaleString('en-US') : String(n));
+        this.display = `${prefix}0${suffix}`;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (!entry.isIntersecting) {
+                    return;
+                }
+                observer.disconnect();
+                const started = performance.now();
+                const tick = (now) => {
+                    const progress = Math.min(1, (now - started) / 1200);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    this.display = `${prefix}${format(Math.round(target * eased))}${suffix}`;
+                    if (progress < 1) {
+                        requestAnimationFrame(tick);
+                    }
+                };
+                requestAnimationFrame(tick);
+            },
+            { threshold: 0.6 },
+        );
+        observer.observe(this.$el);
+    },
+}));
+
 // Fade-up on scroll. Elements are only hidden by CSS when motion is allowed.
 const reveal = () => {
     const nodes = document.querySelectorAll('[data-reveal]');

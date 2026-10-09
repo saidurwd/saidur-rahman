@@ -7,7 +7,8 @@ beforeEach(function () {
 it('serves the public home page with the site bundle', function () {
     $this->get('/')
         ->assertOk()
-        ->assertSee('built in Phase 5');
+        ->assertSee('data-site-header', false)
+        ->assertDontSee('data-lte-toggle', false);
 });
 
 it('serves the admin login with the admin bundle only', function () {

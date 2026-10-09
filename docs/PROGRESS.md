@@ -6,8 +6,8 @@
 | 1 · Data model | Done (tag `phase-1`) |
 | 2 · Admin shell | Done (tag `phase-2`) |
 | 3 · Design system | Done (tag `phase-3`) |
-| 4 · Admin modules | Done (awaiting review and tag) |
-| 5 · Public pages | Pending |
+| 4 · Admin modules | Done (tag `phase-4`) |
+| 5 · Public pages | Done (awaiting review and tag) |
 | 6 · Blog | Pending |
 | 7 · Contact & CV | Pending |
 | 8 · Hardening | Pending |
@@ -55,3 +55,12 @@
 - New npm/composer packages in this phase: `tinymce`, `sortablejs`, `ezyang/htmlpurifier`.
 - Sidebar entries gained Certifications. Skill groups are reached from the Skills page.
 - Public pages do not read these yet (Phase 5). Redirects for changed slugs already work for any path.
+
+## Phase 5 notes
+- Routes: `/`, `/about`, `/experience`, `/projects`, `/projects/{slug}`, `/services`, `/services/{slug}`, and editable pages (privacy and so on) through `Route::fallback`, so the admin and later routes always win. Blog, contact and CV arrive in Phases 6 and 7; until then those menu links 404 and the home page falls back to a `mailto:` contact link and hides the CV button and articles.
+- `SiteContent` is the only reader of public data. It returns published content only and caches it in the `content` group (cleared by the model observers). `SiteShell` shares the name, menus, socials and availability with every `site.*` view once per request. `SeoService` builds Person and BreadcrumbList JSON-LD.
+- **Cache gotcha:** Laravel 13 refuses to unserialize objects from the cache. The Eloquent models and media that `SiteContent` caches are allow-listed in `config/cache.php` (`serializable_classes`). Add any new cached model class there. The test suite runs the array cache with `serialize` on (`CACHE_ARRAY_SERIALIZE`), which catches a missing entry.
+- New editable settings: leadership philosophy and the numbers strip (up to four value/label pairs, counted up on scroll). Capability pillars on the home page are the first three skill groups.
+- Images: `x-site.image` uses the WebP `thumb` and `large` conversions with `srcset`, and width/height recorded at upload by `StoreMediaDimensions`, so there is no layout shift. Images uploaded before this phase have no recorded size until they are re-uploaded.
+- Error pages: a styled 404 on the site layout, and a self-contained 500/503/403/419/429 that needs no database or build.
+- `[x-cloak]` now hides only when JavaScript runs, so timeline details are readable without it.

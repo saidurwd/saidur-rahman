@@ -127,3 +127,24 @@ it('uses the share image as the default Open Graph image', function () {
 
     $this->get('/')->assertSee('property="og:image"', false)->assertSee(basename($path));
 });
+
+it('saves the numbers strip, dropping blank and half-filled rows', function () {
+    $this->put('/admin/settings', settingsPayload(['stats' => [
+        ['value' => '21+', 'label' => 'Years in enterprise IT'],
+        ['value' => '', 'label' => ''],
+        ['value' => '5', 'label' => ''],
+        ['value' => '3', 'label' => 'Flagship systems'],
+    ]]))->assertRedirect();
+
+    expect(app(SettingService::class)->get('stats'))->toBe([
+        ['value' => '21+', 'label' => 'Years in enterprise IT'],
+        ['value' => '3', 'label' => 'Flagship systems'],
+    ]);
+    $this->get('/')->assertSee('Flagship systems');
+});
+
+it('saves the philosophy and shows it on the about page', function () {
+    $this->put('/admin/settings', settingsPayload(['philosophy' => 'Keep systems simple.']))->assertRedirect();
+
+    $this->get('/about')->assertSee('Keep systems simple.');
+});

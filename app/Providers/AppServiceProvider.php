@@ -2,17 +2,20 @@
 
 namespace App\Providers;
 
+use App\Listeners\StoreMediaDimensions;
 use App\Models\Message;
 use App\Policies\ActivityPolicy;
 use App\Policies\MediaPolicy;
-use App\Services\NavigationService;
 use App\Services\SettingService;
+use App\Services\SiteShell;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Models\Activity;
+use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAddedEvent;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->scoped(SettingService::class);
+        $this->app->scoped(SiteShell::class);
     }
 
     /**
@@ -31,6 +35,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Vendor models are not auto-discovered, so their admin policies are registered by hand.
+        Event::listen(MediaHasBeenAddedEvent::class, StoreMediaDimensions::class);
+
         Gate::policy(Activity::class, ActivityPolicy::class);
         Gate::policy(Media::class, MediaPolicy::class);
 
@@ -56,22 +62,7 @@ class AppServiceProvider extends ServiceProvider
             Route::resource($name, $controller)->except('show')->parameters([$name => $param])->whereNumber($param);
         });
 
-        View::composer('site.layouts.app', function ($view): void {
-            $settings = app(SettingService::class);
-            $navigation = app(NavigationService::class);
-
-            $view->with([
-                'siteName' => $settings->get('site_name', config('app.name')),
-                'headerMenu' => $navigation->items('header'),
-                'footerMenu' => $navigation->items('footer'),
-                'socialLinks' => array_filter([
-                    'LinkedIn' => $settings->get('linkedin'),
-                    'GitHub' => $settings->get('github'),
-                ]),
-                'contactEmail' => $settings->get('contact_email'),
-                'availability' => $settings->get('availability_open') ? $settings->get('availability_text') : null,
-            ]);
-        });
+        View::composer('site.*', fn ($view) => $view->with(app(SiteShell::class)->data()));
 
         View::composer(['admin.partials.sidebar', 'admin.partials.navbar'], function ($view): void {
             $view->with('sidebarBadges', ['unread_messages' => Message::unread()->count()]);

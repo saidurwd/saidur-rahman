@@ -15,6 +15,8 @@ class SettingsSeeder extends Seeder
             'positioning' => 'IT leader and builder — 21+ years running enterprise IT, and still shipping production systems (ERP, HMS, AssetTaskPro) myself.',
             'hero_title' => 'I lead IT and I still build the systems.',
             'bio' => 'Head of IT with 21+ years in enterprise IT, ERP and digital transformation.',
+            'philosophy' => 'Sample: technology serves the business, people make it work, and simple systems outlast clever ones.',
+            'stats' => [['value' => '21+', 'label' => 'Years in enterprise IT']],
             'location' => 'Dhaka, Bangladesh',
             'contact_email' => 'hello@saidur-rahman.com',
             'availability_open' => true,

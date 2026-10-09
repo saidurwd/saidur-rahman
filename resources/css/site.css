@@ -388,7 +388,8 @@
         }
     }
 
-    [x-cloak] {
+    /* Only hide x-cloak content when scripts run, so expandable content stays readable without JS. */
+    .js [x-cloak] {
         display: none !important;
     }
 }
@@ -400,6 +401,120 @@
     to {
         stroke-dashoffset: 0;
     }
+}
+
+/* Long-form content from the rich-text editor (already purified on save). */
+.prose-site {
+    max-width: 44rem;
+    font-size: 1.0625rem;
+    line-height: 1.75;
+}
+
+.prose-site > * + * {
+    margin-top: 1.1em;
+}
+
+.prose-site h2,
+.prose-site h3,
+.prose-site h4 {
+    margin-top: 1.8em;
+    line-height: 1.25;
+    color: var(--color-fg);
+}
+
+.prose-site h2 {
+    font-size: 1.6rem;
+}
+
+.prose-site h3 {
+    font-size: 1.3rem;
+}
+
+.prose-site h4 {
+    font-size: 1.1rem;
+}
+
+.prose-site a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
+.prose-site ul,
+.prose-site ol {
+    padding-left: 1.4em;
+}
+
+.prose-site ul {
+    list-style: disc;
+}
+
+.prose-site ol {
+    list-style: decimal;
+}
+
+.prose-site li + li {
+    margin-top: 0.35em;
+}
+
+.prose-site blockquote {
+    border-left: 3px solid var(--color-accent);
+    padding-left: 1.1em;
+    color: var(--color-muted);
+    font-family: var(--font-serif);
+    font-size: 1.15em;
+}
+
+.prose-site pre,
+.prose-site code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+.prose-site pre {
+    overflow-x: auto;
+    padding: 1em;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0.25rem;
+}
+
+.prose-site :not(pre) > code {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0.2rem;
+    padding: 0.1em 0.35em;
+}
+
+.prose-site img {
+    height: auto;
+    max-width: 100%;
+    border-radius: 0.25rem;
+}
+
+.prose-site table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95em;
+    display: block;
+    overflow-x: auto;
+}
+
+.prose-site th,
+.prose-site td {
+    border: 1px solid var(--color-line);
+    padding: 0.5em 0.75em;
+    text-align: left;
+}
+
+.prose-site th {
+    background: var(--color-surface);
+    font-weight: 600;
+}
+
+.prose-site hr {
+    border: 0;
+    border-top: 1px solid var(--color-line);
 }
 
 @media print {

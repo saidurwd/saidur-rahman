@@ -1,6 +1,22 @@
 <?php
 
+use App\Enums\PostStatus;
+use App\Enums\ProjectStatus;
+use App\Models\Certification;
+use App\Models\Education;
+use App\Models\Experience;
+use App\Models\Page;
+use App\Models\Post;
+use App\Models\Project;
+use App\Models\Service;
+use App\Models\Skill;
+use App\Models\SkillGroup;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 return [
 
@@ -36,7 +52,8 @@ return [
 
         'array' => [
             'driver' => 'array',
-            'serialize' => false,
+            // Tests turn this on so cached values go through serialize(), like the database store.
+            'serialize' => (bool) env('CACHE_ARRAY_SERIALIZE', false),
         ],
 
         'database' => [
@@ -131,6 +148,31 @@ return [
     |
     */
 
-    'serializable_classes' => false,
+    /*
+    | Classes that may be unserialized when read back from the cache. Laravel blocks all objects by
+    | default. The public site caches Eloquent models and their media (see SiteContent), so exactly
+    | those classes are allowed; anything else read from the cache stays blocked.
+    */
+
+    'serializable_classes' => [
+        Illuminate\Database\Eloquent\Collection::class,
+        Collection::class,
+        Carbon::class,
+        CarbonImmutable::class,
+        Illuminate\Support\Carbon::class,
+        Media::class,
+        MediaCollection::class,
+        Certification::class,
+        Education::class,
+        Experience::class,
+        Page::class,
+        Post::class,
+        Project::class,
+        Service::class,
+        Skill::class,
+        SkillGroup::class,
+        PostStatus::class,
+        ProjectStatus::class,
+    ],
 
 ];

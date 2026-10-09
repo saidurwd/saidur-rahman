@@ -11,7 +11,7 @@ class SaveSettings
     /** key => group */
     public const TEXT = [
         'site_name' => 'profile', 'headline' => 'profile', 'positioning' => 'profile', 'hero_title' => 'profile',
-        'bio' => 'profile', 'location' => 'profile', 'contact_email' => 'profile', 'availability_text' => 'profile',
+        'bio' => 'profile', 'philosophy' => 'profile', 'location' => 'profile', 'contact_email' => 'profile', 'availability_text' => 'profile',
         'linkedin' => 'social', 'github' => 'social',
         'seo_title' => 'seo', 'seo_description' => 'seo',
     ];
@@ -21,6 +21,8 @@ class SaveSettings
     /** key => [group, max width] */
     public const IMAGES = ['profile_photo' => ['profile', 900], 'og_image' => ['seo', 1200]];
 
+    public const STATS_SLOTS = 4;
+
     public function __construct(private SettingService $settings, private ImageStore $images) {}
 
     /** @param array<string, mixed> $data validated request data */
@@ -29,6 +31,8 @@ class SaveSettings
         foreach (self::TEXT as $key => $group) {
             $this->settings->set($key, filled($data[$key] ?? null) ? trim((string) $data[$key]) : null, $group);
         }
+
+        $this->settings->set('stats', $this->cleanStats((array) ($data['stats'] ?? [])), 'profile');
 
         foreach (self::BOOLEANS as $key => $group) {
             $this->settings->set($key, (bool) ($data[$key] ?? false), $group);
@@ -45,5 +49,27 @@ class SaveSettings
             $this->images->delete($this->settings->get($key));
             $this->settings->set($key, $upload instanceof UploadedFile && ! $remove ? $this->images->store($upload, "settings/{$key}", $width) : null, $group);
         }
+    }
+
+    /**
+     * Numbers strip: up to four value/label pairs; rows missing either half are dropped.
+     *
+     * @param  array<int, array<string, mixed>>  $rows
+     * @return list<array{value: string, label: string}>
+     */
+    private function cleanStats(array $rows): array
+    {
+        $stats = [];
+
+        foreach ($rows as $row) {
+            $value = trim((string) ($row['value'] ?? ''));
+            $label = trim((string) ($row['label'] ?? ''));
+
+            if ($value !== '' && $label !== '' && count($stats) < self::STATS_SLOTS) {
+                $stats[] = ['value' => $value, 'label' => $label];
+            }
+        }
+
+        return $stats;
     }
 }
