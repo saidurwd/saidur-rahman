@@ -1,0 +1,5 @@
+/* Admin styles. AdminLTE 4 is installed in Phase 2. Tailwind is not used here. */
+body {
+    font-family: system-ui, sans-serif;
+    margin: 0;
+}
