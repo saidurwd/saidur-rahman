@@ -22,6 +22,7 @@ class Skill extends Model
 
     /** @use HasFactory<SkillFactory> */
     use HasFactory;
+
     use IsPublishable, LogsChanges, Orderable, SoftDeletes;
 
     protected $fillable = ['skill_group_id', 'name', 'level', 'years', 'sort_order', 'is_published'];

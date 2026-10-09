@@ -22,6 +22,7 @@ class Menu extends Model
 
     /** @use HasFactory<MenuFactory> */
     use HasFactory;
+
     use IsPublishable, LogsChanges, Orderable, SoftDeletes;
 
     protected $fillable = ['label', 'url', 'route', 'location', 'sort_order', 'is_published'];

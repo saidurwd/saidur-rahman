@@ -21,6 +21,7 @@ class Education extends Model
 
     /** @use HasFactory<EducationFactory> */
     use HasFactory;
+
     use IsPublishable, LogsChanges, Orderable, SoftDeletes;
 
     protected $table = 'educations';

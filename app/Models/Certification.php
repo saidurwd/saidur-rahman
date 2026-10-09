@@ -21,6 +21,7 @@ class Certification extends Model
 
     /** @use HasFactory<CertificationFactory> */
     use HasFactory;
+
     use IsPublishable, LogsChanges, Orderable, SoftDeletes;
 
     protected $fillable = ['name', 'issuer', 'issued_at', 'expires_at', 'credential_url', 'sort_order', 'is_published'];

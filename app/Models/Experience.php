@@ -21,6 +21,7 @@ class Experience extends Model
 
     /** @use HasFactory<ExperienceFactory> */
     use HasFactory;
+
     use IsPublishable, LogsChanges, SoftDeletes;
 
     protected $fillable = ['company', 'role', 'location', 'employment_type', 'start_date', 'end_date', 'is_current', 'summary', 'achievements', 'sort_order', 'is_published'];
