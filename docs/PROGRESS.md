@@ -14,7 +14,7 @@
 | 9 · Launch | Pending |
 
 ## Phase 0 notes
-- Laravel 13, PHP 8.4 locally (8.3+ required), Pest 5, Larastan level 6.
+- Laravel 13, PHP 8.4 (the dependency set needs 8.4.1+, so production must run 8.4, not Ubuntu's default 8.3), Pest 5, Larastan level 6.
 - Two Vite entries: `site` (Tailwind 4 + Alpine) and `admin` (plain placeholder until Phase 2).
 - Local DB: MySQL `saidur_rahman` (credentials in git-ignored `.env`). Tests run on in-memory SQLite per `phpunit.xml`.
 

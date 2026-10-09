@@ -1,0 +1,4 @@
+# Laravel's scheduler. Install for the deploy user with:  crontab -e   (paste the line below)
+# It runs every minute and starts whatever is due: scheduled articles, the nightly sitemap, backups and the heartbeats
+# that the admin dashboard and `php artisan launch:check` look at.
+* * * * * cd /var/www/saidur-rahman && /usr/bin/php artisan schedule:run >> /dev/null 2>&1

@@ -1,6 +1,6 @@
 # saidur-rahman.com
 
-Personal website of Saidur Rahman (Head of IT). Laravel 13, PHP 8.3, MySQL 8, Blade.
+Personal website of Saidur Rahman (Head of IT). Laravel 13, PHP 8.4, MySQL 8, Blade.
 Public site: Tailwind CSS 4 + Alpine.js (resources/views/site). Admin: AdminLTE 4 (resources/views/admin, /admin).
 Full architecture: docs/ARCHITECTURE.md. Current progress: docs/PROGRESS.md.
 
