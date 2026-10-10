@@ -8,14 +8,17 @@ use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
-    /** Seeds the single admin. Set ADMIN_EMAIL / ADMIN_PASSWORD in .env, otherwise a password is generated and printed. */
+    /**
+     * Seeds the single admin. Set ADMIN_EMAIL / ADMIN_PASSWORD in .env to choose them. Without ADMIN_PASSWORD the
+     * password is "password" on local and testing machines, and a random one (printed once) everywhere else.
+     */
     public function run(): void
     {
         if (User::query()->exists()) {
             return;
         }
 
-        $password = config('admin.seed.password') ?: Str::password(20);
+        $password = config('admin.seed.password') ?: (app()->environment('local', 'testing') ? 'password' : Str::password(20));
 
         User::query()->create([
             'name' => 'Saidur Rahman',
@@ -23,7 +26,7 @@ class UserSeeder extends Seeder
             'password' => $password,
         ]);
 
-        if (! config('admin.seed.password')) {
+        if (! config('admin.seed.password') && ! app()->environment('local', 'testing')) {
             $this->command?->warn("Admin password (shown once): {$password}");
         }
     }
