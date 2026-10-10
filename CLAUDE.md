@@ -9,6 +9,8 @@ Full architecture: docs/ARCHITECTURE.md. Current progress: docs/PROGRESS.md.
 - php artisan test        # Pest
 - ./vendor/bin/pint       # format
 - ./vendor/bin/phpstan    # Larastan level 6
+- php artisan launch:check  # go-live checklist as code (run on the server)
+- composer test           # clears cached config first; never run tests with a cached config (it points them at the real database)
 
 ## Rules
 - Thin controllers. Validation in Form Requests, authorization in Policies, logic in app/Actions or app/Services.

@@ -10,8 +10,8 @@
 | 5 · Public pages | Done (tag `phase-5`) |
 | 6 · Blog | Done (tag `phase-6`) |
 | 7 · Contact & CV | Done (tag `phase-7`) |
-| 8 · Hardening | Done (awaiting review and tag) |
-| 9 · Launch | Pending |
+| 8 · Hardening | Done (tag `phase-8`) |
+| 9 · Launch | Prepared (awaiting review and tag); the real server is yours to set up |
 
 ## Phase 0 notes
 - Laravel 13, PHP 8.4 (the dependency set needs 8.4.1+, so production must run 8.4, not Ubuntu's default 8.3), Pest 5, Larastan level 6.
@@ -110,3 +110,13 @@
 
 ### Quality
 - 517 tests, PHPStan level 6 with no baseline, Pint clean. No coverage driver (Xdebug or PCOV) is installed here, so coverage was raised by reviewing every Action and Service and adding direct tests for each (`tests/Unit/ActionsTest.php`, `tests/Unit/ServicesTest.php`).
+
+## Phase 9 notes: deployment and launch
+- Everything is in `deploy/` and `docs/DEPLOYMENT.md` (read that for the step-by-step): `deploy.sh`, `nginx.conf`, `cloudflare-ips.sh`, `supervisor/saidur-rahman-queue.conf`, `crontab.txt`, `php-fpm-saidur.ini`, `restore.sh`, and `.env.production.example`.
+- **PHP 8.4 is required** in production (locked dependencies need 8.4.1+); `composer.json` now says `^8.4`. Ubuntu 24.04's default 8.3 will not do.
+- **Backups**: `spatie/laravel-backup` plus `league/flysystem-aws-s3-v3`. Nightly: database dump, uploads, private CV files and `.env`, AES-encrypted with `BACKUP_ARCHIVE_PASSWORD`, to the off-site `backups` disk (any S3-compatible store), verified after writing, 30-day retention, email only on failure or a stale backup. A real backup and restore was run locally into a scratch database (rows came back). The off-site upload itself has not been exercised without credentials.
+- **Health**: the scheduler writes a heartbeat every minute and a queued job every five (`SystemStatus`); the dashboard warns in production when either stops. `php artisan launch:check` (`LaunchChecks`) is the go-live checklist as code: about 40 checks of environment, services, operations and content, exit code 1 on blocking problems (`--strict` also on warnings).
+- **Trusted proxies** moved to `config/trustedproxy.php` because `env()` returns null once config is cached. A test now fails if `env()` is used outside `config/`.
+- **Blank optional values in `.env`** (an empty `BACKUP_NOTIFICATION_EMAIL=`) used to crash every artisan command through the backup package; fixed, with a test that boots the app with them all blank.
+- **Verification done**: Nginx config syntax-checked with Nginx 1.24 and its redirects (http to https, www to apex), dotfile and stray-PHP blocking and static cache headers exercised in a container; a clean clone of the branch passed install, build, Pint, PHPStan and all 540 tests, which is what CI runs. Not done (needs a real server): the Supervisor and cron files, the deploy script, the GitHub deploy job, off-site backup upload, email deliverability, and the live Lighthouse run.
+- **Pint gotcha**: a local `./vendor/bin/pint` run can report "passed" from its cache while a clean checkout fails. Before pushing, run `./vendor/bin/pint --test` in a fresh clone or pass explicit paths (`pint app tests config routes database`).
