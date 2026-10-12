@@ -15,6 +15,7 @@ class AboutController extends Controller
     {
         return view('site.pages.about', [
             'portrait' => $images->url($settings->get('profile_photo')),
+            'testimonials' => $content->testimonials(),
             'skillGroups' => $content->skillGroups(),
             'certifications' => $content->certifications(),
             'education' => $content->education(),

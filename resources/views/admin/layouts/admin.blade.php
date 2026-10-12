@@ -33,6 +33,12 @@
         </div>
         <div class="app-content">
             <div class="container-fluid">
+                @unless (auth()->user()->hasTwoFactorEnabled())
+                    <div class="alert alert-warning d-flex align-items-center gap-2" role="alert">
+                        <i class="bi bi-shield-exclamation"></i>
+                        <div>Two-factor authentication is off, so only your password protects this admin. <a href="{{ route('admin.two-factor.setup') }}" class="alert-link">Turn it on</a>.</div>
+                    </div>
+                @endunless
                 @yield('content')
             </div>
         </div>

@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use App\Actions\Auth\CompleteAdminLogin;
+use App\Actions\Auth\EnableTwoFactor;
+use App\Services\SettingService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +22,10 @@ class EnsureTwoFactor
         $verified = (bool) $request->session()->get(CompleteAdminLogin::SESSION_KEY);
 
         if (! $user?->hasTwoFactorEnabled()) {
-            return $mode === 'allow-setup' ? $next($request) : redirect()->route('admin.two-factor.setup');
+            // Two-factor is required until the admin has deliberately turned it off from the Security page.
+            $required = (bool) app(SettingService::class)->get(EnableTwoFactor::REQUIRED_KEY, true);
+
+            return $mode === 'allow-setup' || ! $required ? $next($request) : redirect()->route('admin.two-factor.setup');
         }
 
         return $verified ? $next($request) : redirect()->route('admin.two-factor.challenge');

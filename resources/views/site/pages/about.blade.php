@@ -87,6 +87,15 @@
         </section>
     @endif
 
+    @if ($testimonials->isNotEmpty())
+        <section class="mt-20 border-t border-line pt-14" aria-labelledby="kind-words">
+            <x-site.section-heading eyebrow="Kind words" title="What colleagues and clients say" id="kind-words" />
+            <div class="mt-10 grid gap-6 md:grid-cols-2">
+                @foreach ($testimonials as $testimonial)@include('site.partials.testimonial', ['testimonial' => $testimonial])@endforeach
+            </div>
+        </section>
+    @endif
+
     <div class="mt-20 flex flex-wrap gap-4 border-t border-line pt-10">
         <x-site.button :href="route('experience')">See my experience</x-site.button>
         <x-site.button :href="route('projects.index')" variant="outline">View work</x-site.button>

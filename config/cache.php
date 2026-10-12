@@ -13,6 +13,7 @@ use App\Models\Service;
 use App\Models\Skill;
 use App\Models\SkillGroup;
 use App\Models\Tag;
+use App\Models\Testimonial;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -182,6 +183,7 @@ return [
         Skill::class,
         SkillGroup::class,
         Tag::class,
+        Testimonial::class,
         Pivot::class,
         PostStatus::class,
         ProjectStatus::class,

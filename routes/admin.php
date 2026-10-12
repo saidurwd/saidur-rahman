@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\TwoFactorChallengeController;
+use App\Http\Controllers\Admin\Auth\TwoFactorManageController;
 use App\Http\Controllers\Admin\Auth\TwoFactorSetupController;
 use App\Http\Controllers\Admin\CacheController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -47,6 +48,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin.2fa:allow-setup'])->group(function () {
     Route::get('two-factor', [TwoFactorSetupController::class, 'show'])->name('two-factor.setup');
     Route::post('two-factor', [TwoFactorSetupController::class, 'store'])->name('two-factor.confirm');
+    Route::post('two-factor/disable', [TwoFactorManageController::class, 'disable'])->name('two-factor.disable');
+    Route::post('two-factor/devices/forget', [TwoFactorManageController::class, 'forgetDevices'])->name('two-factor.forget-devices');
     Route::post('two-factor/recovery-codes', [TwoFactorSetupController::class, 'regenerate'])->name('two-factor.regenerate');
 });
 

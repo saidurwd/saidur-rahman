@@ -51,7 +51,7 @@
 {{-- Numbers --}}
 @if (! empty($stats))
     <section class="border-y border-line" aria-label="Key figures">
-        <dl class="wrap grid grid-cols-2 gap-y-8 py-10 md:grid-cols-{{ min(count($stats), 4) }}">
+        <dl class="wrap grid grid-cols-2 gap-y-8 py-10 {{ ['', 'md:grid-cols-1', 'md:grid-cols-2', 'md:grid-cols-3', 'md:grid-cols-4'][min(count($stats), 4)] }}">
             @foreach ($stats as $stat)
                 <div data-reveal>
                     <dt class="label order-2 mt-2">{{ $stat['label'] }}</dt>
@@ -91,6 +91,18 @@
             </div>
             <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 @foreach ($projects as $project)@include('site.partials.project-card', ['project' => $project])@endforeach
+            </div>
+        </div>
+    </section>
+@endif
+
+{{-- Testimonials --}}
+@if ($testimonials->isNotEmpty())
+    <section class="border-t border-line py-20" aria-labelledby="kind-words">
+        <div class="wrap">
+            <x-site.section-heading eyebrow="Kind words" title="What colleagues and clients say" id="kind-words" />
+            <div class="mt-12 grid gap-6 {{ ['', 'md:grid-cols-1', 'md:grid-cols-2', 'md:grid-cols-3'][min($testimonials->count(), 3)] }}">
+                @foreach ($testimonials as $testimonial)@include('site.partials.testimonial', ['testimonial' => $testimonial])@endforeach
             </div>
         </div>
     </section>

@@ -277,6 +277,20 @@
         transform: scaleY(1);
     }
 
+    /* Testimonial: a large brass opening quote mark above the text */
+    .quote-card::after {
+        content: '\201C';
+        position: absolute;
+        top: 0.25rem;
+        right: 1.25rem;
+        font-family: var(--font-serif);
+        font-size: 5rem;
+        line-height: 1;
+        color: var(--color-highlight);
+        opacity: 0.25;
+        pointer-events: none;
+    }
+
     /* Tech / topic tag */
     .tag {
         display: inline-block;

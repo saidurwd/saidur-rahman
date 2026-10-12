@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin\Auth;
 use App\Actions\Auth\CompleteAdminLogin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Auth\TwoFactorChallengeRequest;
+use App\Services\TrustedDevices;
 use App\Services\TwoFactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -23,6 +25,7 @@ class TwoFactorChallengeController extends Controller
         TwoFactorChallengeRequest $request,
         TwoFactorService $twoFactor,
         CompleteAdminLogin $complete,
+        TrustedDevices $trusted,
     ): RedirectResponse {
         $user = $request->user();
 
@@ -52,6 +55,10 @@ class TwoFactorChallengeController extends Controller
 
         RateLimiter::clear($key);
         $complete($request, $user);
+
+        if ($request->boolean('remember_device')) {
+            Cookie::queue($trusted->cookie($user));
+        }
 
         return redirect()->intended(route('admin.dashboard'));
     }

@@ -12,6 +12,7 @@ use App\Models\Project;
 use App\Models\Service;
 use App\Models\SkillGroup;
 use App\Models\Tag;
+use App\Models\Testimonial;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -224,6 +225,12 @@ class SiteContent
     public function page(string $slug): ?Page
     {
         return $this->remember("page.{$slug}", fn () => Page::query()->published()->where('slug', $slug)->first());
+    }
+
+    /** @return Collection<int, Testimonial> approved quotes only, in the order set in the admin */
+    public function testimonials(): Collection
+    {
+        return $this->remember('testimonials', fn () => Testimonial::query()->published()->with('media')->ordered()->get());
     }
 
     public function hasActiveCv(): bool

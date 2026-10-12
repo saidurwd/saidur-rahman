@@ -20,6 +20,7 @@ class HomeController extends Controller
             'experiences' => $content->experiences()->take(3),
             'pillars' => $content->skillGroups()->take(3),
             'posts' => Route::has('blog.index') ? $content->latestPosts(3) : collect(),
+            'testimonials' => $content->testimonials()->take(3),
             'hasCv' => $content->hasActiveCv(),
             'portrait' => $images->url($settings->get('profile_photo')),
             'schema' => $seo->person(),

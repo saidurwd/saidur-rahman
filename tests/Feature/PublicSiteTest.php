@@ -10,6 +10,7 @@ use App\Models\Project;
 use App\Models\Service;
 use App\Models\Skill;
 use App\Models\SkillGroup;
+use App\Models\Testimonial;
 use App\Services\CacheService;
 use App\Services\SettingService;
 use Database\Seeders\DatabaseSeeder;
@@ -349,4 +350,51 @@ describe('seo and accessibility basics', function () {
 
         expect(substr_count($this->get($path)->getContent(), '<h1'))->toBe(1);
     })->with(['/', '/about', '/experience', '/projects', '/projects/hms-erp']);
+});
+
+describe('testimonials', function () {
+    it('shows approved testimonials on the home page and the about page', function () {
+        Testimonial::factory()->create(['name' => 'Jane Doe', 'position' => 'CIO', 'company' => 'Acme', 'quote' => 'A rare leader who still ships.']);
+
+        foreach (['/', '/about'] as $path) {
+            $this->get($path)->assertOk()->assertSee('What colleagues and clients say')->assertSee('A rare leader who still ships.')->assertSee('Jane Doe')->assertSee('CIO, Acme')
+                ->assertSee('<blockquote', false)->assertSee('<figcaption', false)->assertSee('>JD<', false);
+        }
+    });
+
+    it('hides unapproved and trashed ones, and the whole section when there are none', function () {
+        Testimonial::factory()->create(['name' => 'Pending Pat', 'is_approved' => false]);
+        Testimonial::factory()->create(['name' => 'Deleted Dan'])->delete();
+
+        $this->get('/')->assertDontSee('Pending Pat')->assertDontSee('Deleted Dan')->assertDontSee('What colleagues and clients say');
+        $this->get('/about')->assertDontSee('What colleagues and clients say');
+    });
+
+    it('limits the home page to three, in the admin order, and shows all on the about page', function () {
+        Testimonial::factory()->count(4)->sequence(fn ($s) => ['name' => 'Person '.$s->index, 'sort_order' => $s->index])->create();
+
+        $this->get('/')->assertSee('Person 0')->assertSee('Person 2')->assertDontSee('Person 3');
+        $this->get('/about')->assertSee('Person 3');
+    });
+
+    it('escapes the quote text and shows the photo when there is one', function () {
+        Storage::fake('public');
+        config(['media-library.disk_name' => 'public']);
+        $testimonial = Testimonial::factory()->create(['quote' => '<script>alert(1)</script> Great.']);
+        $path = tempnam(sys_get_temp_dir(), 'p').'.png';
+        imagepng(imagecreatetruecolor(300, 300), $path);
+        $testimonial->addMedia($path)->toMediaCollection('photo');
+        app(CacheService::class)->flush();
+
+        $this->get('/')->assertDontSee('<script>alert(1)</script>', false)->assertSee('&lt;script&gt;', false)->assertSee('rounded-full border border-line object-cover', false)->assertDontSee('aria-hidden="true">'.'TF');
+    });
+
+    it('updates straight away when approved in the admin', function () {
+        $testimonial = Testimonial::factory()->create(['name' => 'Late Larry', 'is_approved' => false]);
+        $this->get('/')->assertDontSee('Late Larry');
+
+        $testimonial->update(['is_approved' => true]);
+
+        $this->get('/')->assertSee('Late Larry');
+    });
 });

@@ -5,6 +5,9 @@
  * disabled, so later phases only need to add the route.
  */
 return [
+    /* How long "trust this browser" skips the two-factor prompt after a correct code. */
+    'trust_days' => (int) env('ADMIN_TRUST_DAYS', 30),
+
     /* Used only by the first-time seeder. Set these in .env before seeding production. */
     'seed' => [
         'email' => env('ADMIN_EMAIL', 'saidurwd@gmail.com'),
