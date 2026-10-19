@@ -6,10 +6,10 @@ use App\Models\Category;
 use App\Models\Certification;
 use App\Models\Education;
 use App\Models\Experience;
+use App\Models\Expertise;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Project;
-use App\Models\Service;
 use App\Models\Skill;
 use App\Models\SkillGroup;
 use App\Models\Tag;
@@ -179,7 +179,7 @@ return [
         Page::class,
         Post::class,
         Project::class,
-        Service::class,
+        Expertise::class,
         Skill::class,
         SkillGroup::class,
         Tag::class,

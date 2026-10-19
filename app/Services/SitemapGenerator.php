@@ -3,10 +3,10 @@
 namespace App\Services;
 
 use App\Models\Category;
+use App\Models\Expertise;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Project;
-use App\Models\Service;
 use Illuminate\Support\Carbon;
 
 /** Builds sitemap.xml from published content. Only pages that a visitor can actually open are listed. */
@@ -40,12 +40,12 @@ class SitemapGenerator
             $entries[] = $this->entry($category->publicPath(), null, 'weekly', '0.4');
         }
 
-        $services = Service::published()->ordered()->get();
-        if ($services->isNotEmpty()) {
-            $entries[] = $this->entry('/services', $services->max('updated_at'), 'monthly', '0.6');
+        $expertises = Expertise::published()->ordered()->get();
+        if ($expertises->isNotEmpty()) {
+            $entries[] = $this->entry('/expertise', $expertises->max('updated_at'), 'monthly', '0.6');
         }
-        foreach ($services as $service) {
-            $entries[] = $this->entry($service->publicPath(), $service->updated_at, 'monthly', '0.5');
+        foreach ($expertises as $expertise) {
+            $entries[] = $this->entry($expertise->publicPath(), $expertise->updated_at, 'monthly', '0.5');
         }
 
         foreach (Page::published()->ordered()->get() as $page) {

@@ -9,7 +9,7 @@
         </x-slot:actions>
 
         <div class="p-3 border-bottom">
-            <p class="small text-body-secondary mb-3">Redirects are added automatically when you change the slug of a project, service or page. Add your own here for old addresses.</p>
+            <p class="small text-body-secondary mb-3">Redirects are added automatically when you change the slug of a project, expertise or page. Add your own here for old addresses.</p>
             <form method="GET" class="row g-2" role="search">
                 <div class="col-md-6"><input type="search" name="q" value="{{ request('q') }}" class="form-control form-control-sm" placeholder="Search paths" aria-label="Search"></div>
                 <div class="col-auto">

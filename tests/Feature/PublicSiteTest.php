@@ -5,9 +5,9 @@ use App\Models\Certification;
 use App\Models\CvFile;
 use App\Models\Education;
 use App\Models\Experience;
+use App\Models\Expertise;
 use App\Models\Page;
 use App\Models\Project;
-use App\Models\Service;
 use App\Models\Skill;
 use App\Models\SkillGroup;
 use App\Models\Testimonial;
@@ -273,14 +273,19 @@ describe('case study', function () {
     });
 });
 
-describe('services and pages', function () {
-    it('lists and shows published services only', function () {
-        Service::factory()->create(['title' => 'ERP advisory', 'slug' => 'erp-advisory', 'body' => '<p>Details here</p>']);
-        Service::factory()->create(['title' => 'Hidden service', 'slug' => 'hidden', 'is_published' => false]);
+describe('expertise and pages', function () {
+    it('lists and shows published expertise only', function () {
+        Expertise::factory()->create(['title' => 'ERP advisory', 'slug' => 'erp-advisory', 'body' => '<p>Details here</p>']);
+        Expertise::factory()->create(['title' => 'Hidden expertise', 'slug' => 'hidden', 'is_published' => false]);
 
-        $this->get('/services')->assertOk()->assertSee('ERP advisory')->assertDontSee('Hidden service');
-        $this->get('/services/erp-advisory')->assertOk()->assertSee('Details here');
-        $this->get('/services/hidden')->assertNotFound();
+        $this->get('/expertise')->assertOk()->assertSee('ERP advisory')->assertDontSee('Hidden expertise');
+        $this->get('/expertise/erp-advisory')->assertOk()->assertSee('Details here');
+        $this->get('/expertise/hidden')->assertNotFound();
+    });
+
+    it('redirects the old /services addresses to /expertise', function () {
+        $this->get('/services')->assertRedirect('/expertise')->assertStatus(301);
+        $this->get('/services/erp-advisory')->assertRedirect('/expertise/erp-advisory')->assertStatus(301);
     });
 
     it('serves editable pages by slug and 404s unpublished ones', function () {

@@ -26,7 +26,7 @@ return [
         ['label' => 'Education', 'icon' => 'mortarboard', 'route' => 'admin.educations.index'],
         ['label' => 'Certifications', 'icon' => 'patch-check', 'route' => 'admin.certifications.index'],
         ['label' => 'Skills', 'icon' => 'bar-chart-steps', 'route' => 'admin.skills.index'],
-        ['label' => 'Services', 'icon' => 'tools', 'route' => 'admin.services.index'],
+        ['label' => 'Expertise', 'icon' => 'tools', 'route' => 'admin.expertise.index'],
         ['label' => 'Testimonials', 'icon' => 'chat-quote', 'route' => 'admin.testimonials.index'],
         ['label' => 'Pages', 'icon' => 'file-earmark-text', 'route' => 'admin.pages.index'],
 

@@ -5,12 +5,12 @@ use App\Http\Controllers\Site\BlogController;
 use App\Http\Controllers\Site\ContactController;
 use App\Http\Controllers\Site\CvController;
 use App\Http\Controllers\Site\ExperienceController;
+use App\Http\Controllers\Site\ExpertiseController;
 use App\Http\Controllers\Site\FeedController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\PageController;
 use App\Http\Controllers\Site\ProjectController;
 use App\Http\Controllers\Site\RobotsController;
-use App\Http\Controllers\Site\ServiceController;
 use App\Http\Controllers\Site\SitemapController;
 use App\Http\Controllers\Site\StyleguideController;
 use App\Http\Middleware\CountPostView;
@@ -50,8 +50,11 @@ Route::middleware(TrackPageView::class)->withoutMiddleware($cookieless)->group(f
         Route::get('/blog/tag/{slug}', [BlogController::class, 'tag'])->name('blog.tag');
         Route::get('/feed', FeedController::class)->name('feed');
 
-        Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
-        Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('services.show');
+        Route::get('/expertise', [ExpertiseController::class, 'index'])->name('expertise.index');
+        Route::get('/expertise/{slug}', [ExpertiseController::class, 'show'])->name('expertise.show');
+
+        Route::redirect('/services', '/expertise', 301);
+        Route::get('/services/{slug}', fn (string $slug) => redirect('/expertise/'.$slug, 301));
 
         Route::get('/cv', [CvController::class, 'show'])->name('cv');
         Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');

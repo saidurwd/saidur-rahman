@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Models\Service;
+use App\Models\Expertise;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<Service> */
-class ServiceFactory extends Factory
+/** @extends Factory<Expertise> */
+class ExpertiseFactory extends Factory
 {
     /** @return array<string, mixed> */
     public function definition(): array

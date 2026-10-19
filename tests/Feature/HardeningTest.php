@@ -3,11 +3,11 @@
 use App\Enums\PostStatus;
 use App\Enums\ProjectStatus;
 use App\Models\Category;
+use App\Models\Expertise;
 use App\Models\Page;
 use App\Models\PageView;
 use App\Models\Post;
 use App\Models\Project;
-use App\Models\Service;
 use App\Services\ImageStore;
 use App\Services\SettingService;
 use App\Services\SitemapGenerator;
@@ -115,7 +115,7 @@ describe('public pages carry no cookies', function () {
         $response = $this->get($path)->assertOk();
 
         expect($response->headers->getCookies())->toBe([]);
-    })->with(['/', '/about', '/experience', '/projects', '/projects/hms-erp', '/blog', '/blog/sample-published-article', '/services', '/cv', '/privacy', '/feed', '/sitemap.xml']);
+    })->with(['/', '/about', '/experience', '/projects', '/projects/hms-erp', '/blog', '/blog/sample-published-article', '/expertise', '/cv', '/privacy', '/feed', '/sitemap.xml']);
 
     it('does not set a cookie on a 404', function () {
         expect($this->get('/nowhere')->assertNotFound()->headers->getCookies())->toBe([]);
@@ -217,8 +217,8 @@ describe('sitemap and robots', function () {
         Post::factory()->create(['slug' => 'public-post']);
         Post::factory()->create(['slug' => 'draft-post', 'status' => PostStatus::Draft, 'published_at' => null]);
         Post::factory()->create(['slug' => 'future-post', 'status' => PostStatus::Scheduled, 'published_at' => now()->addDay()]);
-        Service::factory()->create(['slug' => 'advisory']);
-        Service::factory()->create(['slug' => 'hidden-service', 'is_published' => false]);
+        Expertise::factory()->create(['slug' => 'advisory']);
+        Expertise::factory()->create(['slug' => 'hidden-expertise', 'is_published' => false]);
         Page::factory()->create(['slug' => 'privacy']);
         Page::factory()->create(['slug' => 'secret-page', 'is_published' => false]);
 
@@ -229,8 +229,8 @@ describe('sitemap and robots', function () {
             $urls[] = parse_url((string) $entry->loc, PHP_URL_PATH) ?: '/';
         }
 
-        expect($urls)->toContain('/', '/about', '/projects', '/projects/public-project', '/blog/public-post', '/services', '/services/advisory', '/privacy', '/contact')
-            ->not->toContain('/projects/draft-project', '/blog/draft-post', '/blog/future-post', '/services/hidden-service', '/secret-page')
+        expect($urls)->toContain('/', '/about', '/projects', '/projects/public-project', '/blog/public-post', '/expertise', '/expertise/advisory', '/privacy', '/contact')
+            ->not->toContain('/projects/draft-project', '/blog/draft-post', '/blog/future-post', '/expertise/hidden-expertise', '/secret-page')
             ->and((string) $document->url[3]->lastmod)->not->toBeEmpty();
     });
 

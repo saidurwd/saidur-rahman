@@ -6,11 +6,11 @@ use App\Models\Certification;
 use App\Models\CvFile;
 use App\Models\Education;
 use App\Models\Experience;
+use App\Models\Expertise;
 use App\Models\Message;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Project;
-use App\Models\Service;
 use App\Models\Testimonial;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -172,7 +172,7 @@ class LaunchChecks
             'Certifications' => [Certification::class, ['name', 'issuer']],
             'Articles' => [Post::class, ['title', 'excerpt', 'body']],
             'Pages' => [Page::class, ['title', 'body']],
-            'Services' => [Service::class, ['title', 'summary', 'body']],
+            'Expertise' => [Expertise::class, ['title', 'summary', 'body']],
             'Testimonials' => [Testimonial::class, ['name', 'quote', 'company']],
         ];
 

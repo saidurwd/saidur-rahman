@@ -10,18 +10,18 @@ use App\Models\Concerns\IsPublishable;
 use App\Models\Concerns\LogsChanges;
 use App\Models\Concerns\Orderable;
 use App\Observers\ContentObserver;
-use Database\Factories\ServiceFactory;
+use Database\Factories\ExpertiseFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ObservedBy(ContentObserver::class)]
-class Service extends Model implements HasPublicPath
+class Expertise extends Model implements HasPublicPath
 {
     use AdminListFilters, HasPublishState;
 
-    /** @use HasFactory<ServiceFactory> */
+    /** @use HasFactory<ExpertiseFactory> */
     use HasFactory;
 
     use HasSlug, IsPublishable, LogsChanges, Orderable, SoftDeletes;
@@ -44,6 +44,6 @@ class Service extends Model implements HasPublicPath
 
     public function publicPath(?string $slug = null): string
     {
-        return '/services/'.($slug ?? $this->slug);
+        return '/expertise/'.($slug ?? $this->slug);
     }
 }

@@ -49,7 +49,7 @@
 
 ## Phase 4 notes
 - Reference module: Projects. Pattern and variations are in `docs/ADMIN_MODULE_PATTERN.md`; `/new-admin-module` (in `.claude/commands/`) walks Claude through adding another.
-- Modules: Projects, Experience, Education, Certifications, Skill groups, Skills, Services, Pages, Menus, Testimonials, Redirects, CV files, Profile & settings, plus read-only Activity log and Media. Articles come in Phase 6 and Messages in Phase 7.
+- Modules: Projects, Experience, Education, Certifications, Skill groups, Skills, Expertise, Pages, Menus, Testimonials, Redirects, CV files, Profile & settings, plus read-only Activity log and Media. Articles come in Phase 6 and Messages in Phase 7.
 - Shared pieces: `ManagesModule` trait (Trash, restore, force delete, reorder, bulk), `Route::adminModule()` macro, `ReorderItems` and `ApplyBulkAction` actions, `SaveSlugged`, `HtmlSanitizer` (HTMLPurifier), `RedirectService` plus a 404 handler that serves recorded redirects, `ImageStore`, `AdminPolicy`.
 - TinyMCE 8 is self-hosted and loaded only on pages with a rich-text field. It runs under the GPL licence key (`license_key: 'gpl'`); check that is acceptable for how the site is distributed, or switch to Trix.
 - New npm/composer packages in this phase: `tinymce`, `sortablejs`, `ezyang/htmlpurifier`.
@@ -57,7 +57,7 @@
 - Public pages do not read these yet (Phase 5). Redirects for changed slugs already work for any path.
 
 ## Phase 5 notes
-- Routes: `/`, `/about`, `/experience`, `/projects`, `/projects/{slug}`, `/services`, `/services/{slug}`, and editable pages (privacy and so on) through `Route::fallback`, so the admin and later routes always win. Blog, contact and CV arrive in Phases 6 and 7; until then those menu links 404 and the home page falls back to a `mailto:` contact link and hides the CV button and articles.
+- Routes: `/`, `/about`, `/experience`, `/projects`, `/projects/{slug}`, `/expertise`, `/expertise/{slug}`, and editable pages (privacy and so on) through `Route::fallback`, so the admin and later routes always win. Blog, contact and CV arrive in Phases 6 and 7; until then those menu links 404 and the home page falls back to a `mailto:` contact link and hides the CV button and articles.
 - `SiteContent` is the only reader of public data. It returns published content only and caches it in the `content` group (cleared by the model observers). `SiteShell` shares the name, menus, socials and availability with every `site.*` view once per request. `SeoService` builds Person and BreadcrumbList JSON-LD.
 - **Cache gotcha:** Laravel 13 refuses to unserialize objects from the cache. The Eloquent models and media that `SiteContent` caches are allow-listed in `config/cache.php` (`serializable_classes`). Add any new cached model class there. The test suite runs the array cache with `serialize` on (`CACHE_ARRAY_SERIALIZE`), which catches a missing entry.
 - New editable settings: leadership philosophy and the numbers strip (up to four value/label pairs, counted up on scroll). Capability pillars on the home page are the first three skill groups.
@@ -97,7 +97,7 @@
 - Still on the Phase 9 list: Nginx security headers for static files, `APP_DEBUG=false`, `.env` outside the web root, backups, optional IP restriction or Cloudflare Access for `/admin`.
 
 ### Performance
-- **Full-page cache** (Spatie ResponseCache, `file` store, 24 hours): home, about, experience, projects, articles, services, CV, feed, sitemap and editable pages. Never cached: search results (any query other than `page` and `tech`), the contact page, downloads, the admin, redirects and 404s. `CacheService::flush()` and `SettingService::forget()` clear it, so any admin save shows on the site immediately. **After a deploy that changes views, run `php artisan responsecache:clear`** (it is not cleared by `view:cache`).
+- **Full-page cache** (Spatie ResponseCache, `file` store, 24 hours): home, about, experience, projects, articles, expertise, CV, feed, sitemap and editable pages. Never cached: search results (any query other than `page` and `tech`), the contact page, downloads, the admin, redirects and 404s. `CacheService::flush()` and `SettingService::forget()` clear it, so any admin save shows on the site immediately. **After a deploy that changes views, run `php artisan responsecache:clear`** (it is not cleared by `view:cache`).
 - Page and article views are still counted when a page comes from the cache (`TrackPageView` and `CountPostView` run outside it).
 - `php artisan optimize` (config, route, view and event caches) works. Do not run tests with a cached config: it points the tests at your real MySQL database. Run `php artisan optimize:clear` first (`composer test` does this).
 - **Lighthouse** (mobile, simulated slow 4G, local PHP server without compression or HTTP/2, so only a baseline): Home 98, case study 97, article 97 for Performance; Accessibility 100 and Best Practices 100 on all three. SEO showed 66 only because non-production environments serve `Disallow: /` in robots.txt on purpose; production serves the real one. LCP was 2.3 to 2.4 s, above the 1.5 s target: the lab run sends uncompressed files over a throttled link. Re-measure on the real server (gzip or Brotli, HTTP/2, long-lived asset caching) in Phase 9. Fixes made from the first run: above-the-fold headings no longer fade in (Total Blocking Time fell from 680 ms to 30 ms), and the Inter and Fraunces fonts are preloaded.
@@ -129,3 +129,8 @@
 - **Security page** (`/admin/two-factor`): when 2FA is on, it now has "Turn off two-factor authentication" (needs the current password and an authenticator code or recovery code, rate limited to 5 tries a minute) and "Forget trusted browsers". Turning it back on is the normal QR setup.
 - **Required by default.** The setting `two_factor_required` is missing on a fresh install, which means required, so the first sign-in is sent to setup. Turning 2FA off sets it to false and the admin then opens with a password alone, with a warning banner on every admin page (and `launch:check` still fails its "Admin has two-factor authentication" check on the live server). Enabling 2FA sets it back to true.
 - **Trust this browser for 30 days** (`ADMIN_TRUST_DAYS`): a checkbox on the code prompt. It sets an HTTP-only cookie scoped to `/admin`, signed with the app key and tied to the account's secret, password, enrolment time and a revocation code. A trusted browser still needs the correct password but skips the code until the time is up. The trust ends when the password changes, 2FA is turned off or re-enrolled, or "Forget trusted browsers" is used. Services: `TrustedDevices`, actions `DisableTwoFactor` and `EnableTwoFactor`.
+
+## Rename: Services -> Expertise
+
+- Model `Expertise` (table `expertises`), `Admin\ExpertiseController`, `Site\ExpertiseController`, views under `expertise/`, admin at `/admin/expertise`, public at `/expertise`.
+- `/services` and `/services/{slug}` 301 to the new addresses. The migration `rename_services_to_expertises` also moves activity-log subjects, menu links and stored redirects; run `php artisan migrate` on the server and clear the cache.

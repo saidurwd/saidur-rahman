@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Expertise;
 use App\Models\Menu;
 use App\Models\Page;
-use App\Models\Service;
 use App\Models\Testimonial;
 use Illuminate\Database\Seeder;
 
@@ -41,7 +41,7 @@ class SiteSeeder extends Seeder
 HTML,
         ]);
 
-        Service::query()->create([
+        Expertise::query()->create([
             'title' => 'ERP advisory',
             'summary' => 'Sample: selecting, implementing and rescuing ERP projects.',
             'is_published' => false,

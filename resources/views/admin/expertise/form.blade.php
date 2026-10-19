@@ -1,12 +1,12 @@
 @php($editing = $record->exists)
 
-@extends('admin.layouts.admin', ['breadcrumbs' => ['Dashboard' => route('admin.dashboard'), 'Services' => route('admin.services.index'), ($editing ? 'Edit' : 'New') => null]])
+@extends('admin.layouts.admin', ['breadcrumbs' => ['Dashboard' => route('admin.dashboard'), 'Expertise' => route('admin.expertise.index'), ($editing ? 'Edit' : 'New') => null]])
 
-@section('title', $editing ? 'Edit service' : 'New service')
+@section('title', $editing ? 'Edit expertise' : 'New expertise')
 
 @section('content')
 <form method="POST" data-unsaved-warning
-      action="{{ $editing ? route('admin.services.update', $record) : route('admin.services.store') }}">
+      action="{{ $editing ? route('admin.expertise.update', $record) : route('admin.expertise.store') }}">
     @csrf
     @if ($editing) @method('PUT') @endif
 
@@ -47,7 +47,7 @@
 
 @if ($editing)
     <div class="mb-4">
-        <x-admin.delete-button :action="route('admin.services.destroy', $record)" label="Move to Trash" />
+        <x-admin.delete-button :action="route('admin.expertise.destroy', $record)" label="Move to Trash" />
     </div>
 @endif
 @endsection

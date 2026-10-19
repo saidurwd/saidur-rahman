@@ -58,10 +58,10 @@ Guests are redirected; index lists, searches, filters and paginates; create and 
 
 ## Modules built on this pattern
 
-Projects (reference, own `SaveProject` action for media), Experience, Education, Certifications, Skill groups, Skills, Services, Pages, Menus, Testimonials. Variations worth copying:
+Projects (reference, own `SaveProject` action for media), Experience, Education, Certifications, Skill groups, Skills, Expertise, Pages, Menus, Testimonials. Variations worth copying:
 
 - No drag reorder: Experience (ordered by date). Pass `'reorder' => false` to `Route::adminModule`.
-- Slug and redirects through `SaveSlugged`: Services, Pages (Pages also blocks reserved slugs).
+- Slug and redirects through `SaveSlugged`: Expertise, Pages (Pages also blocks reserved slugs).
 - Select options from another table: Skills (`groups` passed from the controller).
 - Media on the model: Testimonials (`HasMedia`, a `photo` collection, `syncPhoto()`).
 - Approval instead of publish: Testimonials override `publishState()` and `publishColumn()`.

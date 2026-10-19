@@ -3,9 +3,9 @@
 use App\Enums\PostStatus;
 use App\Enums\ProjectStatus;
 use App\Models\Experience;
+use App\Models\Expertise;
 use App\Models\Post;
 use App\Models\Project;
-use App\Models\Service;
 use App\Models\Skill;
 use App\Models\Testimonial;
 
@@ -30,11 +30,11 @@ it('only returns published projects and can narrow to featured', function () {
 });
 
 it('hides unpublished flag-based content', function () {
-    Service::factory()->create(['is_published' => false]);
-    Service::factory()->create();
+    Expertise::factory()->create(['is_published' => false]);
+    Expertise::factory()->create();
     Experience::factory()->create(['is_published' => false]);
 
-    expect(Service::published()->count())->toBe(1)
+    expect(Expertise::published()->count())->toBe(1)
         ->and(Experience::published()->count())->toBe(0);
 });
 
@@ -46,11 +46,11 @@ it('only shows approved testimonials', function () {
 });
 
 it('orders by sort_order then id', function () {
-    Service::factory()->create(['title' => 'Second', 'sort_order' => 2]);
-    Service::factory()->create(['title' => 'First', 'sort_order' => 1]);
-    Service::factory()->create(['title' => 'Also first', 'sort_order' => 1]);
+    Expertise::factory()->create(['title' => 'Second', 'sort_order' => 2]);
+    Expertise::factory()->create(['title' => 'First', 'sort_order' => 1]);
+    Expertise::factory()->create(['title' => 'Also first', 'sort_order' => 1]);
 
-    expect(Service::ordered()->pluck('title')->all())->toBe(['First', 'Also first', 'Second']);
+    expect(Expertise::ordered()->pluck('title')->all())->toBe(['First', 'Also first', 'Second']);
 });
 
 it('orders the career timeline current role first, then newest', function () {

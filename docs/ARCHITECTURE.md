@@ -54,7 +54,7 @@ Nine public pages and fourteen admin modules; every public section is driven by 
 | Experience | `/experience` | Full career timeline with roles, scope and achievements |
 | Projects | `/projects`, `/projects/{slug}` | Case studies: problem, role, architecture, stack, outcomes, screenshots (HMS ERP, Tea ERP, AssetTaskPro) |
 | Articles | `/blog`, `/blog/{slug}`, `/blog/category/{slug}` | Writing on IT leadership, ERP, Laravel, digital transformation |
-| Services | `/services` | Optional: consulting offers (ERP advisory, IT audit, digital transformation) |
+| Expertise | `/expertise` | Optional: consulting offers (ERP advisory, IT audit, digital transformation) |
 | Speaking & media | `/media` | Optional: talks, interviews, awards |
 | Contact | `/contact` | Form, email, LinkedIn, location (Dhaka, open to Qatar/GCC), availability status |
 | CV | `/cv` | Download tracked PDF; choose IT Leadership or Engineering version |
@@ -71,7 +71,7 @@ Nine public pages and fourteen admin modules; every public section is driven by 
 | Skills | Grouped skills with level and order |
 | Projects | Case studies with gallery, tech tags, featured flag, status |
 | Articles | Posts, categories, tags, drafts, scheduled publish, SEO fields |
-| Services | Optional offers with icon and order |
+| Expertise | Optional offers with icon and order |
 | Testimonials | Quotes from colleagues and clients, with approval |
 | Messages | Contact inbox: read, star, reply by email, archive, export |
 | CV files | Upload versions, set active, see download counts |
@@ -143,7 +143,7 @@ About 20 tables. Every content table has `sort_order`, `is_published` (or `statu
 | `projects` | title, slug, client, role, period, summary, problem, solution, architecture, outcomes, tech\_stack (json), live\_url, repo\_url, is\_featured, status, seo\_title, seo\_description | Case studies; images via media table |
 | `posts` | title, slug, excerpt, body, category\_id, status (draft/scheduled/published), published\_at, reading\_minutes, views, seo\_title, seo\_description, og\_image | Articles |
 | `categories` / `tags` / `post_tag` | name, slug |  |
-| `services` | title, slug, icon, summary, body | Optional |
+| `expertises` | title, slug, icon, summary, body | Optional |
 | `testimonials` | name, position, company, quote, photo, is\_approved |  |
 | `messages` | name, email, company, subject, body, ip, user\_agent, status (new/read/replied/spam), read\_at, starred | Contact inbox |
 | `cv_files` | label (Leadership / Engineering), file\_path, is\_active, downloads |  |
@@ -189,7 +189,7 @@ Recommended concept: **"The Architect's Ledger"** — an editorial, blueprint-in
 Keep AdminLTE close to stock so it stays maintainable; brand it with your monogram, the tea-leaf green as primary colour and dark mode on by default.
 
 - **Layout:** one `admin/layouts/admin.blade.php` with sidebar, top navbar (view site, notifications for new messages, profile, logout), breadcrumbs and flash toasts
-- **Sidebar groups:** Dashboard · Content (Projects, Articles, Experience, Education, Skills, Services, Testimonials, Pages) · Inbox (Messages with unread badge) · Files (CV files, Media) · Site (Profile & Settings, Menus, Redirects) · System (Activity log, Cache clear)
+- **Sidebar groups:** Dashboard · Content (Projects, Articles, Experience, Education, Skills, Expertise, Testimonials, Pages) · Inbox (Messages with unread badge) · Files (CV files, Media) · Site (Profile & Settings, Menus, Redirects) · System (Activity log, Cache clear)
 - **Reusable Blade components:** `x-admin.card`, `x-admin.form.input`, `.textarea`, `.select`, `.editor`, `.image-upload`, `.toggle`, `x-admin.table`, `x-admin.delete-button`, `x-admin.status-badge`. Claude builds these once in Phase 2, then every module uses them
 - **List screens:** search, status filter, pagination, drag-and-drop reorder (SortableJS) where order matters, bulk publish/unpublish/delete
 - **Edit screens:** two columns — content left, publish box right (status, publish date, featured, SEO fields, featured image); live slug preview; "View on site" button
@@ -346,7 +346,7 @@ slug auto-generation with redirect on change, soft delete + Trash, Form Requests
 Write feature tests. Then document this pattern in docs/ADMIN_MODULE_PATTERN.md.
 ```
 
-Then one short session per remaining module: *"Following docs/ADMIN\_MODULE\_PATTERN.md exactly, build the Experience module"* — repeat for Education, Certifications, Skills, Services, Testimonials, Pages, Menus, Redirects, CV files and Profile & Settings.
+Then one short session per remaining module: *"Following docs/ADMIN\_MODULE\_PATTERN.md exactly, build the Experience module"* — repeat for Education, Certifications, Skills, Expertise, Testimonials, Pages, Menus, Redirects, CV files and Profile & Settings.
 
 **Done when:** every section of the public site can be edited from admin and every module has passing tests.
 

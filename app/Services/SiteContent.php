@@ -6,10 +6,10 @@ use App\Models\Certification;
 use App\Models\CvFile;
 use App\Models\Education;
 use App\Models\Experience;
+use App\Models\Expertise;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Project;
-use App\Models\Service;
 use App\Models\SkillGroup;
 use App\Models\Tag;
 use App\Models\Testimonial;
@@ -97,15 +97,15 @@ class SiteContent
             ->values());
     }
 
-    /** @return Collection<int, Service> */
-    public function services(): Collection
+    /** @return Collection<int, Expertise> */
+    public function expertises(): Collection
     {
-        return $this->remember('services', fn () => Service::query()->published()->ordered()->get());
+        return $this->remember('expertise', fn () => Expertise::query()->published()->ordered()->get());
     }
 
-    public function service(string $slug): ?Service
+    public function expertise(string $slug): ?Expertise
     {
-        return $this->services()->firstWhere('slug', $slug);
+        return $this->expertises()->firstWhere('slug', $slug);
     }
 
     /** @return Collection<int, Post> */
