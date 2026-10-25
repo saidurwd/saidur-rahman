@@ -24,12 +24,12 @@ class TrustedDevices
     {
         $expires = now()->addDays((int) config('admin.trust_days'))->getTimestamp();
 
-        return Cookie::create(self::COOKIE, $this->value($user, $expires), $expires, '/admin', null, $this->secure(), true, false, Cookie::SAMESITE_LAX);
+        return Cookie::create(self::COOKIE, $this->value($user, $expires), $expires, '/', null, $this->secure(), true, false, Cookie::SAMESITE_LAX);
     }
 
     public function forgetCookie(): Cookie
     {
-        return Cookie::create(self::COOKIE, '', 1, '/admin', null, $this->secure(), true, false, Cookie::SAMESITE_LAX);
+        return Cookie::create(self::COOKIE, '', 1, '/', null, $this->secure(), true, false, Cookie::SAMESITE_LAX);
     }
 
     public function isTrusted(Request $request, User $user): bool

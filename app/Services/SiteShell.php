@@ -10,7 +10,7 @@ class SiteShell
 
     private ?int $forRequest = null;
 
-    public function __construct(private SettingService $settings, private NavigationService $navigation) {}
+    public function __construct(private SettingService $settings, private NavigationService $navigation, private ImageStore $images) {}
 
     /** @return array<string, mixed> */
     public function data(): array
@@ -24,6 +24,7 @@ class SiteShell
 
         return $this->data ??= [
             'siteName' => $this->settings->get('site_name', config('app.name')),
+            'profilePhoto' => $this->images->url($this->settings->get('profile_photo')),
             'headerMenu' => $this->navigation->items('header'),
             'footerMenu' => $this->navigation->items('footer'),
             'socialLinks' => array_filter([

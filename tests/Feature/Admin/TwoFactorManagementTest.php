@@ -39,13 +39,13 @@ describe('trusting a browser', function () {
         $this->actingAs($user)->get('/admin/two-factor/challenge')->assertSee('Trust this browser for 30 days');
     });
 
-    it('sets a long-lived, http-only cookie scoped to /admin when asked', function () {
+    it('sets a long-lived, http-only cookie valid on the whole site when asked', function () {
         $user = adminWithApp();
 
         $response = $this->actingAs($user)->post('/admin/two-factor/challenge', ['code' => currentCode($user), 'remember_device' => 1])->assertRedirect('/admin');
         $cookie = collect($response->headers->getCookies())->first(fn ($c) => $c->getName() === TrustedDevices::COOKIE);
 
-        expect($cookie)->not->toBeNull()->and($cookie->isHttpOnly())->toBeTrue()->and($cookie->getPath())->toBe('/admin')
+        expect($cookie)->not->toBeNull()->and($cookie->isHttpOnly())->toBeTrue()->and($cookie->getPath())->toBe('/')
             ->and($cookie->getExpiresTime())->toBeGreaterThan(now()->addDays(29)->getTimestamp())->and($cookie->getExpiresTime())->toBeLessThanOrEqual(now()->addDays(30)->getTimestamp());
     });
 

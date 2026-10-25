@@ -42,7 +42,11 @@
     :class="scrolled ? 'border-line py-2' : 'py-4'">
     <div class="wrap flex items-center justify-between gap-6">
         <a href="{{ route('home') }}" class="flex items-center gap-3 text-fg no-underline" aria-label="{{ $siteName }}, home">
-            <x-site.monogram class="size-8" />
+            @if ($profilePhoto)
+                <img src="{{ $profilePhoto }}" alt="" width="32" height="32" class="size-8 shrink-0 rounded-full object-cover">
+            @else
+                <x-site.monogram class="size-8" />
+            @endif
             <span class="font-serif text-lg font-medium tracking-tight">{{ $siteName }}</span>
         </a>
 
