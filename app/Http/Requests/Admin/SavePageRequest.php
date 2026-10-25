@@ -11,7 +11,7 @@ class SavePageRequest extends FormRequest
     /** Paths that belong to the app itself and must not be taken by a page. */
     private const RESERVED_SLUGS = [
         'admin', 'about', 'experience', 'projects', 'blog', 'services', 'expertise', 'media', 'contact', 'cv',
-        'sitemap.xml', 'feed', 'robots.txt', 'styleguide', 'up', 'login', 'storage', 'build', 'favicon.svg',
+        'sitemap.xml', 'feed', 'robots.txt', 'styleguide', 'up', 'login', 'storage', 'build', 'favicon.svg', 'favicon.png', 'apple-touch-icon.png',
     ];
 
     public function authorize(): bool

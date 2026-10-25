@@ -6,6 +6,7 @@ use App\Http\Controllers\Site\ContactController;
 use App\Http\Controllers\Site\CvController;
 use App\Http\Controllers\Site\ExperienceController;
 use App\Http\Controllers\Site\ExpertiseController;
+use App\Http\Controllers\Site\FaviconController;
 use App\Http\Controllers\Site\FeedController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\PageController;
@@ -59,6 +60,8 @@ Route::middleware(TrackPageView::class)->withoutMiddleware($cookieless)->group(f
         Route::get('/cv', [CvController::class, 'show'])->name('cv');
         Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
         Route::get('/robots.txt', RobotsController::class)->name('robots');
+        Route::get('/favicon.png', [FaviconController::class, 'favicon'])->name('favicon');
+        Route::get('/apple-touch-icon.png', [FaviconController::class, 'appleTouchIcon'])->name('apple-touch-icon');
     });
 
     // The view counter has to run even when the article comes from the cache, so it sits outside it.

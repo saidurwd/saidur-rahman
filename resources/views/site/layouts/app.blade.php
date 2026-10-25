@@ -4,7 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0F1B2D">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    @if ($profilePhoto)
+        <link rel="icon" href="{{ url('/favicon.png') }}" type="image/png" sizes="64x64">
+        <link rel="apple-touch-icon" href="{{ url('/apple-touch-icon.png') }}">
+    @else
+        <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    @endif
 
     {{-- Sets the theme and the js flag before first paint so there is no flash. The text is hashed in the CSP. --}}
     <script>{!! \App\Support\ThemeInit::SCRIPT !!}</script>
