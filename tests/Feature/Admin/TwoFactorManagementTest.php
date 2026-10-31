@@ -118,6 +118,17 @@ describe('trusting a browser', function () {
         $this->get('/admin')->assertRedirect('/admin/two-factor/challenge');
     });
 
+    it('skips the code for a trusted browser that is signed in without the password form', function () {
+        $user = adminWithApp();
+        [$name, $value] = trustCookie($user);
+
+        $this->actingAs($user)->withCookie($name, $value)->get('/admin')->assertOk();
+    });
+
+    it('still asks for a code when a signed-in browser is not trusted', function () {
+        $this->actingAs(adminWithApp())->get('/admin')->assertRedirect('/admin/two-factor/challenge');
+    });
+
     it('can forget every trusted browser', function () {
         $user = adminWithApp();
         [$name, $value] = trustCookie($user);

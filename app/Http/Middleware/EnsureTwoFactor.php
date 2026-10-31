@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Actions\Auth\CompleteAdminLogin;
 use App\Actions\Auth\EnableTwoFactor;
 use App\Services\SettingService;
+use App\Services\TrustedDevices;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +27,12 @@ class EnsureTwoFactor
             $required = (bool) app(SettingService::class)->get(EnableTwoFactor::REQUIRED_KEY, true);
 
             return $mode === 'allow-setup' || ! $required ? $next($request) : redirect()->route('admin.two-factor.setup');
+        }
+
+        // Signed in without the password form (e.g. a "remember me" cookie): a trusted browser still skips the code.
+        if (! $verified && app(TrustedDevices::class)->isTrusted($request, $user)) {
+            app(CompleteAdminLogin::class)($request, $user);
+            $verified = true;
         }
 
         return $verified ? $next($request) : redirect()->route('admin.two-factor.challenge');
