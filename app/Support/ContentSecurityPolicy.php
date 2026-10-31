@@ -16,6 +16,9 @@ class ContentSecurityPolicy
 {
     private const TURNSTILE = 'https://challenges.cloudflare.com';
 
+    /** Video pages play YouTube through its privacy-enhanced (no cookies until played) embed. */
+    private const YOUTUBE = 'https://www.youtube-nocookie.com';
+
     public static function for(Request $request): string
     {
         $admin = $request->is('admin', 'admin/*');
@@ -30,7 +33,7 @@ class ContentSecurityPolicy
             'img-src' => ["'self'", 'data:', 'blob:', 'https:'],
             'font-src' => ["'self'", 'data:'],
             'connect-src' => $admin ? ["'self'"] : ["'self'", self::TURNSTILE],
-            'frame-src' => $admin ? ["'self'", 'blob:'] : [self::TURNSTILE],
+            'frame-src' => $admin ? ["'self'", 'blob:'] : [self::TURNSTILE, self::YOUTUBE],
             'media-src' => ["'self'"],
             'worker-src' => ["'self'", 'blob:'],
             'object-src' => ["'none'"],

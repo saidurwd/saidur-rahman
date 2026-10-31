@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Post;
+use App\Models\Video;
 use Carbon\CarbonInterface;
 
 /** Builds the structured data (JSON-LD) the public pages hand to <x-site.seo>. */
@@ -48,6 +49,20 @@ class SeoService
                 'item' => $item[1] ?? null,
             ]))->all(),
         ];
+    }
+
+    /** @return array<string, mixed> */
+    public function video(Video $video): array
+    {
+        return array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'VideoObject',
+            'name' => $video->title,
+            'description' => $video->seo_description ?: ($video->description ?: $video->title),
+            'thumbnailUrl' => $video->thumbnailUrl(),
+            'uploadDate' => $this->iso($video->published_at),
+            'embedUrl' => $video->embedUrl(),
+        ]);
     }
 
     /** @return array<string, mixed> */

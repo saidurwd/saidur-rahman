@@ -134,3 +134,13 @@
 
 - Model `Expertise` (table `expertises`), `Admin\ExpertiseController`, `Site\ExpertiseController`, views under `expertise/`, admin at `/admin/expertise`, public at `/expertise`.
 - `/services` and `/services/{slug}` 301 to the new addresses. The migration `rename_services_to_expertises` also moves activity-log subjects, menu links and stored redirects; run `php artisan migrate` on the server and clear the cache.
+
+## Videos
+- **What it is:** a video library. The admin pastes YouTube links (Admin > Videos); visitors browse and search them at `/videos`, linked from the top navigation.
+- **Admin** (`/admin/videos`, copied from the Expertise/Posts pattern, no drag reorder because videos are listed newest first): paste any YouTube link (watch, youtu.be, shorts, embed, live, or a bare ID) and only the 11-character ID is stored (`App\Support\YouTube`, validated in `SaveVideoRequest`). Title, slug (301 redirect when it changes, via `SaveSlugged`), plain-text description (5,000 chars), a free-text **Topic** (suggestions come from topics already used), Published and Featured toggles, publish date (set automatically on first publish), SEO fields. List has search, state and topic filters, thumbnails, Trash, bulk publish/unpublish/trash. Action: `SaveVideo`.
+- **Public:** `/videos` (featured first on the unfiltered first page, topic buttons with counts via `?topic=`, search via `?q=` over title, description and topic, 12 per page) and `/videos/{slug}` (player, description, "More to watch" with the same topic first). Reads go through `SiteContent` (cached, cleared by the observer); search is uncached, published-only and `noindex`. `Video` is in the cache allow-list.
+- **Privacy and speed:** nothing loads from YouTube until the visitor presses play. The page shows YouTube's thumbnail; play swaps in a `youtube-nocookie.com` iframe (the public CSP `frame-src` allows only that host; the admin policy is unchanged). Without JavaScript the thumbnail is a normal link to YouTube.
+- **SEO:** `VideoObject` and breadcrumb JSON-LD, the videos page and each published video in the sitemap.
+- **Navigation:** the migration `add_videos_to_header_menu` adds "Videos" to an existing site's header menu (just before Contact); the seeder does the same for fresh installs. Manage it afterwards in Admin > Menus.
+- **Deploy:** run `php artisan migrate` and clear the cache (Admin > Cache clear).
+- **Tests:** `tests/Feature/Admin/VideosTest.php`, `tests/Feature/VideosTest.php`, `tests/Unit/YouTubeTest.php` (59 tests). Full suite: 630 of 634 pass; the 2 failures are in `HardeningTest` (security headers, HSTS) and fail without these changes too.

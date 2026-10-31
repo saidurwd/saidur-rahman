@@ -14,6 +14,7 @@ use App\Models\Skill;
 use App\Models\SkillGroup;
 use App\Models\Tag;
 use App\Models\Testimonial;
+use App\Models\Video;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -184,6 +185,7 @@ return [
         SkillGroup::class,
         Tag::class,
         Testimonial::class,
+        Video::class,
         Pivot::class,
         PostStatus::class,
         ProjectStatus::class,

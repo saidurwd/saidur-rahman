@@ -20,6 +20,7 @@ return [
         ['header' => 'Content'],
         ['label' => 'Projects', 'icon' => 'kanban', 'route' => 'admin.projects.index'],
         ['label' => 'Articles', 'icon' => 'journal-text', 'route' => 'admin.posts.index'],
+        ['label' => 'Videos', 'icon' => 'play-btn', 'route' => 'admin.videos.index'],
         ['label' => 'Categories', 'icon' => 'folder2', 'route' => 'admin.categories.index'],
         ['label' => 'Tags', 'icon' => 'tags', 'route' => 'admin.tags.index'],
         ['label' => 'Experience', 'icon' => 'briefcase', 'route' => 'admin.experiences.index'],

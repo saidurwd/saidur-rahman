@@ -13,6 +13,7 @@ use App\Models\Project;
 use App\Models\SkillGroup;
 use App\Models\Tag;
 use App\Models\Testimonial;
+use App\Models\Video;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -220,6 +221,80 @@ class SiteContent
     public function feedPosts(int $limit = 20): Collection
     {
         return $this->remember('feed', fn () => Post::query()->published()->with('category')->orderByDesc('published_at')->limit($limit)->get());
+    }
+
+    public const VIDEOS_PER_PAGE = 12;
+
+    /** @return Collection<int, Video> all live videos, newest first */
+    public function videos(): Collection
+    {
+        return $this->remember('videos', fn () => Video::query()->published()->latestPublished()->get());
+    }
+
+    /** @return Collection<int, Video> */
+    public function featuredVideos(int $limit = 3): Collection
+    {
+        return $this->videos()->where('is_featured', true)->take($limit)->values();
+    }
+
+    /** @return list<array{name: string, count: int}> topics that have live videos, A to Z */
+    public function videoTopics(): array
+    {
+        return $this->videos()
+            ->filter(fn (Video $video) => filled($video->topic))
+            ->groupBy('topic')
+            ->map(fn ($videos, $topic) => ['name' => (string) $topic, 'count' => $videos->count()])
+            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values()
+            ->all();
+    }
+
+    public function video(string $slug): ?Video
+    {
+        return $this->videos()->firstWhere('slug', $slug);
+    }
+
+    /** @return LengthAwarePaginator<int, Video> */
+    public function videoPage(?string $topic, int $page): LengthAwarePaginator
+    {
+        $videos = $this->videos()->when($topic, fn ($c) => $c->filter(fn (Video $v) => $v->topic === $topic))->values();
+
+        return new LengthAwarePaginator(
+            $videos->forPage($page, self::VIDEOS_PER_PAGE)->values(),
+            $videos->count(),
+            self::VIDEOS_PER_PAGE,
+            $page,
+            ['path' => url()->current()],
+        );
+    }
+
+    /**
+     * Search is not cached (every query is different), but it still only sees live videos.
+     *
+     * @return LengthAwarePaginator<int, Video>
+     */
+    public function searchVideos(string $term, int $page): LengthAwarePaginator
+    {
+        return Video::query()
+            ->published()
+            ->matching($term)
+            ->latestPublished()
+            ->paginate(self::VIDEOS_PER_PAGE, page: $page)
+            ->appends(['q' => $term]);
+    }
+
+    /**
+     * More to watch: the same topic first, then the newest others.
+     *
+     * @return Collection<int, Video>
+     */
+    public function relatedVideos(Video $video, int $limit = 3): Collection
+    {
+        return $this->videos()
+            ->reject(fn (Video $other) => $other->is($video))
+            ->sortByDesc(fn (Video $other) => $video->topic && $other->topic === $video->topic ? 1 : 0)
+            ->take($limit)
+            ->values();
     }
 
     public function page(string $slug): ?Page

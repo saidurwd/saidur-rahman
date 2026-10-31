@@ -64,6 +64,7 @@ Projects (reference, own `SaveProject` action for media), Experience, Education,
 - Slug and redirects through `SaveSlugged`: Expertise, Pages (Pages also blocks reserved slugs).
 - Select options from another table: Skills (`groups` passed from the controller).
 - Media on the model: Testimonials (`HasMedia`, a `photo` collection, `syncPhoto()`).
+- Newest-first list with a publish date, no drag reorder, a parsed external link and public search: Videos (`SaveVideo` wraps `SaveSlugged`).
 - Approval instead of publish: Testimonials override `publishState()` and `publishColumn()`.
 
 Modules that deliberately do not follow the full shape:

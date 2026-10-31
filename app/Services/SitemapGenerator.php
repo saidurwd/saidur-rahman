@@ -7,6 +7,7 @@ use App\Models\Expertise;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Project;
+use App\Models\Video;
 use Illuminate\Support\Carbon;
 
 /** Builds sitemap.xml from published content. Only pages that a visitor can actually open are listed. */
@@ -23,6 +24,7 @@ class SitemapGenerator
             $this->entry('/experience', null, 'monthly', '0.7'),
             $this->entry('/projects', Project::published()->max('updated_at'), 'monthly', '0.9'),
             $this->entry('/blog', Post::published()->max('updated_at'), 'weekly', '0.8'),
+            $this->entry('/videos', Video::published()->max('updated_at'), 'weekly', '0.7'),
             $this->entry('/contact', null, 'yearly', '0.5'),
             $this->entry('/cv', null, 'monthly', '0.4'),
         ];
@@ -33,6 +35,10 @@ class SitemapGenerator
 
         foreach (Post::published()->orderByDesc('published_at')->get() as $post) {
             $entries[] = $this->entry($post->publicPath(), $post->updated_at, 'monthly', '0.7');
+        }
+
+        foreach (Video::published()->latestPublished()->get() as $video) {
+            $entries[] = $this->entry($video->publicPath(), $video->updated_at, 'monthly', '0.6');
         }
 
         $categories = Category::query()->whereHas('posts', fn ($q) => $q->published())->ordered()->get();

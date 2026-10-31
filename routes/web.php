@@ -14,6 +14,7 @@ use App\Http\Controllers\Site\ProjectController;
 use App\Http\Controllers\Site\RobotsController;
 use App\Http\Controllers\Site\SitemapController;
 use App\Http\Controllers\Site\StyleguideController;
+use App\Http\Controllers\Site\VideoController;
 use App\Http\Middleware\CountPostView;
 use App\Http\Middleware\TrackPageView;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -50,6 +51,9 @@ Route::middleware(TrackPageView::class)->withoutMiddleware($cookieless)->group(f
         Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
         Route::get('/blog/tag/{slug}', [BlogController::class, 'tag'])->name('blog.tag');
         Route::get('/feed', FeedController::class)->name('feed');
+
+        Route::get('/videos', [VideoController::class, 'index'])->name('videos.index');
+        Route::get('/videos/{slug}', [VideoController::class, 'show'])->name('videos.show');
 
         Route::get('/expertise', [ExpertiseController::class, 'index'])->name('expertise.index');
         Route::get('/expertise/{slug}', [ExpertiseController::class, 'show'])->name('expertise.show');

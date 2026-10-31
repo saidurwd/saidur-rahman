@@ -14,7 +14,7 @@ class SiteSeeder extends Seeder
     {
         $header = [
             ['About', '/about'], ['Experience', '/experience'], ['Projects', '/projects'],
-            ['Articles', '/blog'], ['Contact', '/contact'],
+            ['Articles', '/blog'], ['Videos', '/videos'], ['Contact', '/contact'],
         ];
         foreach ($header as $i => [$label, $url]) {
             Menu::query()->create(['label' => $label, 'url' => $url, 'location' => 'header', 'sort_order' => $i]);

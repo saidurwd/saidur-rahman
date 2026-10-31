@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\SkillController;
 use App\Http\Controllers\Admin\SkillGroupController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\VideoController;
 use Illuminate\Support\Facades\Route;
 
 // Prefix `admin`, name `admin.` and the web middleware are applied in bootstrap/app.php.
@@ -72,6 +73,7 @@ Route::middleware(['auth', 'admin.2fa'])->group(function () {
     Route::adminModule('pages', PageController::class);
     Route::adminModule('menus', MenuController::class);
     Route::adminModule('posts', PostController::class, ['reorder' => false]);
+    Route::adminModule('videos', VideoController::class, ['reorder' => false]);
     Route::adminModule('categories', CategoryController::class);
     Route::post('tags/bulk', [TagController::class, 'bulk'])->name('tags.bulk');
     Route::resource('tags', TagController::class)->except('show')->whereNumber('tag');
