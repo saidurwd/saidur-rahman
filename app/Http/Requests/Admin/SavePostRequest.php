@@ -4,8 +4,8 @@ namespace App\Http\Requests\Admin;
 
 use App\Enums\PostStatus;
 use App\Models\Post;
+use App\Support\TagList;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class SavePostRequest extends FormRequest
@@ -17,18 +17,13 @@ class SavePostRequest extends FormRequest
         return $this->user()->can($record ? 'update' : 'create', $record ?? Post::class);
     }
 
-    /** Tags arrive as one comma-separated string and are cleaned into a list of unique names. */
+    /** Tags arrive as one string separated by commas or #, e.g. "ERP, Laravel" or "#erp #laravel", and are cleaned into a list of unique names. */
     protected function prepareForValidation(): void
     {
         $tags = $this->input('tags');
 
         if (is_string($tags)) {
-            $this->merge(['tags' => collect(explode(',', $tags))
-                ->map(fn (string $tag) => Str::squish($tag))
-                ->filter()
-                ->unique(fn (string $tag) => Str::lower($tag))
-                ->values()
-                ->all()]);
+            $this->merge(['tags' => TagList::split($tags)]);
         }
     }
 

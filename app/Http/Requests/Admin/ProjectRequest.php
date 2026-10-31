@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use App\Enums\ProjectStatus;
 use App\Models\Project;
+use App\Support\TagList;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -15,12 +16,7 @@ abstract class ProjectRequest extends FormRequest
         $stack = $this->input('tech_stack');
 
         if (is_string($stack)) {
-            $this->merge(['tech_stack' => collect(explode(',', $stack))
-                ->map(fn (string $item) => trim($item))
-                ->filter()
-                ->unique()
-                ->values()
-                ->all()]);
+            $this->merge(['tech_stack' => TagList::split($stack)]);
         }
     }
 
@@ -59,6 +55,20 @@ abstract class ProjectRequest extends FormRequest
             'media_alt.*' => ['nullable', 'string', 'max:190'],
             'remove_media' => ['nullable', 'array'],
             'remove_media.*' => ['integer'],
+        ];
+    }
+
+    /** @return array<string, string> */
+    public function attributes(): array
+    {
+        return [
+            'tech_stack' => 'tech stack',
+            'tech_stack.*' => 'tech stack item',
+            'seo_title' => 'SEO title',
+            'seo_description' => 'SEO description',
+            'live_url' => 'live URL',
+            'repo_url' => 'repository URL',
+            'cover_alt' => 'cover alt text',
         ];
     }
 }

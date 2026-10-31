@@ -36,7 +36,7 @@
                     <div class="col-md-6"><x-admin.form.input name="client" label="Client" :value="$project->client" /></div>
                     <div class="col-md-6"><x-admin.form.input name="role" label="My role" :value="$project->role" /></div>
                     <div class="col-md-6"><x-admin.form.input name="period" label="Period" :value="$project->period" placeholder="2022 – 2024" /></div>
-                    <div class="col-md-6"><x-admin.form.input name="tech_stack" label="Tech stack" :value="implode(', ', old('tech_stack', $project->tech_stack ?? []))" help="Comma separated." /></div>
+                    <div class="col-md-6"><x-admin.form.input name="tech_stack" label="Tech stack" :value="implode(', ', old('tech_stack', $project->tech_stack ?? []))" help="Separate with commas or #, e.g. Laravel, MySQL or #laravel #mysql." /></div>
                     <div class="col-md-6"><x-admin.form.input name="live_url" type="url" label="Live URL" :value="$project->live_url" /></div>
                     <div class="col-md-6"><x-admin.form.input name="repo_url" type="url" label="Repository URL" :value="$project->repo_url" /></div>
                 </div>

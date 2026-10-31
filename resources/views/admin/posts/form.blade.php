@@ -3,7 +3,7 @@
     $cover = $editing ? $record->getFirstMedia('cover') : null;
     $statusOptions = collect(\App\Enums\PostStatus::cases())->mapWithKeys(fn ($s) => [$s->value => \Illuminate\Support\Str::headline($s->value)])->all();
     $publishedAt = old('published_at', $record->published_at?->format('Y-m-d\TH:i'));
-    $tagList = old('tags') !== null ? (is_array(old('tags')) ? old('tags') : explode(',', old('tags'))) : $record->tags->pluck('name')->all();
+    $tagList = old('tags') !== null ? (is_array(old('tags')) ? old('tags') : \App\Support\TagList::split(old('tags'))) : $record->tags->pluck('name')->all();
 @endphp
 
 @extends('admin.layouts.admin', ['breadcrumbs' => ['Dashboard' => route('admin.dashboard'), 'Articles' => route('admin.posts.index'), ($editing ? 'Edit' : 'New') => null]])
@@ -48,7 +48,7 @@
 
             <x-admin.card title="Organise">
                 <x-admin.form.select name="category_id" label="Category" :options="$categories" :value="$record->category_id" placeholder="No category" />
-                <x-admin.form.input name="tags" label="Tags" :value="implode(', ', $tagList)" list="known-tags" help="Comma separated. New tags are created automatically." />
+                <x-admin.form.input name="tags" label="Tags" :value="implode(', ', $tagList)" list="known-tags" help="Separate with commas or #, e.g. ERP, Laravel or #erp #laravel. New tags are created automatically." />
                 <datalist id="known-tags">@foreach ($knownTags as $tag)<option value="{{ $tag }}">@endforeach</datalist>
             </x-admin.card>
 

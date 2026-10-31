@@ -76,6 +76,12 @@ describe('create and update', function () {
             ->and($post->tags->pluck('name')->sort()->values()->all())->toBe(['ERP', 'Laravel']);
     });
 
+    it('accepts tags separated by # as well as commas', function () {
+        $this->post('/admin/posts', validPost(['tags' => '#ERP #Laravel, C#']))->assertSessionHasNoErrors();
+
+        expect(Post::query()->latest('id')->first()->tags->pluck('name')->sort()->values()->all())->toBe(['C#', 'ERP', 'Laravel']);
+    });
+
     it('reuses existing tags instead of duplicating them', function () {
         Tag::factory()->create(['name' => 'ERP', 'slug' => 'erp']);
 

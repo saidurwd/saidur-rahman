@@ -1,6 +1,10 @@
 @props(['name', 'label' => null, 'type' => 'text', 'value' => null, 'help' => null, 'required' => false])
 
-@php $id = $attributes->get('id', $name); @endphp
+@php
+    $id = $attributes->get('id', $name);
+    // Array fields (e.g. tech_stack.0) report under "name.*", so their errors belong to this field too.
+    $messages = array_merge($errors->get($name), ...array_values($errors->get($name.'.*')));
+@endphp
 
 <div class="mb-3">
     @if ($label)
@@ -12,8 +16,8 @@
         id="{{ $id }}"
         @if ($type !== 'password') value="{{ old($name, $value) }}" @endif
         @required($required)
-        {{ $attributes->except('id')->class(['form-control', 'is-invalid' => $errors->has($name)]) }}
+        {{ $attributes->except('id')->class(['form-control', 'is-invalid' => $messages !== []]) }}
     >
     @if ($help)<div class="form-text">{{ $help }}</div>@endif
-    @error($name)<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+    @if ($messages !== [])<div class="invalid-feedback d-block">{{ $messages[0] }}</div>@endif
 </div>

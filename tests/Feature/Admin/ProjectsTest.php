@@ -293,3 +293,23 @@ describe('reorder and bulk', function () {
         $this->post('/admin/projects/bulk', ['action' => 'publish'])->assertSessionHasErrors('ids');
     });
 });
+
+describe('limit errors', function () {
+    it('shows an error next to the field for a tech stack item that is too long', function () {
+        $this->from('/admin/projects/create')->post('/admin/projects', validProject(['tech_stack' => 'Laravel, '.str_repeat('x', 61)]))
+            ->assertRedirect('/admin/projects/create')->assertSessionHasErrors('tech_stack.1');
+
+        $this->get('/admin/projects/create')->assertSee('tech stack item', false)->assertSee('is-invalid', false);
+    });
+
+    it('shows the error for a summary over 600 characters', function () {
+        $this->from('/admin/projects/create')->post('/admin/projects', validProject(['summary' => str_repeat('a', 601)]))->assertSessionHasErrors('summary');
+        $this->get('/admin/projects/create')->assertSee('must not be greater than 600 characters');
+    });
+});
+
+it('accepts a tech stack separated by # or commas and keeps C#', function () {
+    $this->post('/admin/projects', validProject(['tech_stack' => '#Laravel #MySQL, C#']))->assertSessionHasNoErrors();
+
+    expect(Project::query()->latest('id')->first()->tech_stack)->toBe(['Laravel', 'MySQL', 'C#']);
+});
