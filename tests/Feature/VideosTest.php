@@ -50,13 +50,13 @@ describe('visibility', function () {
 });
 
 describe('watching', function () {
-    it('shows a click-to-play player that loads nothing from YouTube until played', function () {
+    it('shows the video in an embedded player, with a link to YouTube as a fallback', function () {
         liveVideo(['slug' => 'intro', 'title' => 'Intro talk', 'youtube_id' => 'dQw4w9WgXcQ', 'description' => "First line\nSecond <b>line</b>"]);
 
         $html = $this->get('/videos/intro')->assertOk()->assertSee('Intro talk')->getContent();
 
-        expect($html)->toContain('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ')
-            ->and($html)->toContain('x-if="playing"')
+        expect($html)->toContain('<iframe src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0"')
+            ->and($html)->toContain('allowfullscreen')
             ->and($html)->toContain('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
             ->and($html)->toContain('First line<br />')
             ->and($html)->not->toContain('<b>line</b>');

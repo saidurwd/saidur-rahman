@@ -14,23 +14,14 @@
         @if ($video->topic)· <a href="{{ route('videos.index', ['topic' => $video->topic]) }}" class="no-underline hover:text-accent">{{ $video->topic }}</a>@endif
     </p>
 
-    {{-- Click-to-play: nothing is loaded from YouTube until the visitor presses play. Without JavaScript the link opens YouTube. --}}
-    <div class="mt-8 max-w-4xl overflow-hidden rounded border border-line bg-black" x-data="{ playing: false }">
-        <div class="relative aspect-video">
-            <template x-if="playing">
-                <iframe src="{{ $video->embedUrl(true) }}" title="{{ $video->title }}" class="absolute inset-0 h-full w-full" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-            </template>
-            <a href="{{ $video->watchUrl() }}" x-show="!playing" @click.prevent="playing = true" target="_blank" rel="noopener" class="group absolute inset-0 block no-underline" aria-label="Play video: {{ $video->title }}">
-                <img src="{{ $video->thumbnailUrl() }}" alt="" width="480" height="360" decoding="async" class="h-full w-full object-cover">
-                <span class="absolute inset-0 grid place-items-center">
-                    <span class="grid h-16 w-16 place-items-center rounded-full bg-black/75 text-white transition-transform group-hover:scale-105 motion-reduce:transition-none" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" class="ml-1 h-7 w-7 fill-current"><path d="M8 5v14l11-7z"/></svg>
-                    </span>
-                </span>
-            </a>
-        </div>
+    {{-- Privacy-enhanced embed: youtube-nocookie.com sets no cookies until the visitor plays. Lazy-loaded so it never slows the page. --}}
+    <div class="mt-8 w-full max-w-4xl overflow-hidden rounded border border-line bg-black">
+        {{-- The 16:9 ratio is set on the iframe itself, so the height always follows the width. --}}
+        <iframe src="{{ $video->embedUrl() }}" title="{{ $video->title }}" class="block aspect-video w-full border-0" style="aspect-ratio: 16 / 9; height: auto" loading="lazy"
+            allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
-    <p class="mt-3 text-sm text-muted">Playing loads the video from YouTube. <a href="{{ $video->watchUrl() }}" class="link" target="_blank" rel="noopener">Watch on YouTube</a></p>
+    <p class="mt-3 text-sm text-muted">Can’t see the player? <a href="{{ $video->watchUrl() }}" class="link" target="_blank" rel="noopener">Watch on YouTube</a></p>
 
     @if ($video->description)
         <div class="prose-site mt-10 max-w-3xl">{!! nl2br(e($video->description)) !!}</div>
